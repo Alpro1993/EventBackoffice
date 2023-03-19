@@ -14,20 +14,6 @@ public static class DbInitializer
         }
         context.Database.EnsureCreated();
 
-        // Event data
-        var events = new Event[]
-        {
-            new Event{Name="Tech Conference 2023", StartDate=new DateTime(2023, 6, 5), EndDate=new DateTime(2023, 6, 7)},
-            new Event{Name="Startup Summit 2023", StartDate=new DateTime(2023, 8, 15), EndDate=new DateTime(2023, 8, 16)},
-            new Event{Name="Big Data Symposium 2023", StartDate=new DateTime(2023, 10, 18), EndDate=new DateTime(2023, 10, 20)},
-        };
-
-        foreach (Event e in events)
-        {
-            context.Events.Add(e);
-        }
-        context.SaveChanges();
-
         var venues = new List<Venue>
         {
             new Venue { Name = "Convention Center", Location = "https://www.example.com/convention-center" },
@@ -45,6 +31,38 @@ public static class DbInitializer
             new Room { Name = "Room C", Venue = venues[1] },
             new Room { Name = "Room D", Venue = venues[2] },
         };
+
+                // Event data
+        var events = new Event[]
+        {
+            new Event
+            {
+                Name="Tech Conference 2023", 
+                StartDate=new DateTime(2023, 6, 5), 
+                EndDate=new DateTime(2023, 6, 7),
+                Venues = venues.Take(3).ToList()
+            },
+            new Event
+            {
+                Name="Startup Summit 2023",
+                StartDate=new DateTime(2023, 8, 15),
+                EndDate=new DateTime(2023, 8, 16),
+                Venues = venues.Take(1).ToList()
+            },
+            new Event
+            {
+                Name="Big Data Symposium 2023", 
+                StartDate=new DateTime(2023, 10, 18),
+                EndDate=new DateTime(2023, 10, 20),
+                Venues = venues.Take(2).ToList()
+            }
+        };
+    
+        foreach (Event e in events)
+        {
+            context.Events.Add(e);
+        }
+        context.SaveChanges();
 
         context.Rooms.AddRange(rooms);
         context.SaveChanges();

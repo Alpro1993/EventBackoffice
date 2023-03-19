@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 using EventBackofficeBackend.Models.DTOs.Event;
+using System.Globalization;
 
 namespace EventBackofficeBackend.Repositories;
 
@@ -20,15 +21,27 @@ public class EventsRepository
         _context = context;
     }
 
-    public async Task CreateAsync(Event @event) 
+    public async Task<PostEventResponse> CreateAsync(PostEventRequest request) 
     {
-        if (@event.EventID is not 0) 
+        if (_context.Events.Any(e => e.Name.Equals(request.Name))) 
         {
-            throw new InvalidOperationException();
+            //Commented out to avoid ISE until I find better option
+            //throw new InvalidOperationException("An event with that name already exists");
+            return new PostEventResponse();
         }
+
+        var @event = new Event {
+            Name = request.Name,
+            StartDate = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT")),
+            EndDate = DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", new CultureInfo("pt-PT"))
+        };
 
         await _context.AddAsync(@event);
         await _context.SaveChangesAsync();
+
+        return new PostEventResponse {
+            eventID = @event.EventID 
+        };
     }
 
     // public async Task UpdateAsync(int eventId, Event @event)
@@ -41,6 +54,20 @@ public class EventsRepository
 
     // }
 
+    public async Task DeleteAsync(int id)
+    {
+        var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
+
+        if (@event is null)
+        {
+            throw new InvalidOperationException("Event was not found");
+        }
+
+        _context.Events.Remove(@event);
+        await _context.SaveChangesAsync();
+    }
+
+    //GET METHODS
     public async Task<GetEventsResponse> GetEventsAsync()
     {
         var queryable = _context.Events.AsQueryable();
@@ -58,54 +85,81 @@ public class EventsRepository
         };
     }
 
-    public async Task<Event> GetEventByIdAsync(int id, bool asNoTracking = false)
-    {
-        var queryable = _context.Events.AsQueryable();
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.EventID == id);
-        }
-
-        return await queryable.FirstOrDefaultAsync(s => s.EventID == id); 
-    }
-
-    public async Task DeleteAsync(int id)
+    public async Task<GetSingleEventResponse> GetEventByIdAsync(int id)
     {
         var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
 
-        if (@event is null)
+        if (@event is not null)
         {
-            throw new InvalidOperationException();
+            return new GetSingleEventResponse {
+                EventID = @event.EventID,
+                Name = @event.Name,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate
+            };
+        } else 
+        {
+            // Commented out to stop ISE until I find better option
+            //throw new InvalidOperationException("Event not found");
+            return new GetSingleEventResponse();
         }
 
-        _context.Events.Remove(@event);
-        await _context.SaveChangesAsync();
     }
 
-    // public async Task<List<Event>> GetEventsByVenue(int venueId, bool asNoTracking = false)
-    // {
-    //     var queryable = _context.Events.Where(s => s.Venues.Any(x => x.VenueID == venueId));
 
-    //     if (asNoTracking)
-    //     {
-    //         return await queryable.AsNoTracking().ToListAsync();
-    //     }
+    public async Task<GetEventsResponse> GetEventsByVenue(int venueId, bool asNoTracking = false)
+    {
+        var queryable = _context.Events
+            .Where(q => q.Venues
+                .Any(x => x.VenueID == venueId)
+            );
 
-    //     return await queryable.ToListAsync();
-    // }
+        var _events = ProjectToGetEventsResponseDTO(queryable);
 
-    // public async Task<List<Event>> GetEventsByDate(DateTime date, bool asNoTracking = false)
-    // {
-    //     var queryable = _context.Events.Where(d => d.StartDate.Year == date.Year 
-    //                                                 && d.StartDate.Month == date.Month
-    //                                                 && d.StartDate.Day == date.Day);
+        if (_events is not null)
+        {
+            return new GetEventsResponse
+                {
+                    events = await _events
+                };
+        }
+        else
+        {   
+            // Commented out to avoid ISE until I find a better option
+            //throw new Exception("No event was found in Venue with ID " + venueId);
+            return new GetEventsResponse();
+        }
+    }
 
-    //     if (asNoTracking)
-    //     {
-    //         return await queryable.AsNoTracking().ToListAsync();
-    //     }
+    public async Task<GetEventsResponse> GetEventsByDate(DateTime date, bool asNoTracking = false)
+    {
+        var queryable = _context.Events.Where(d => d.StartDate.Year == date.Year 
+                                                    && d.StartDate.Month == date.Month
+                                                    && d.StartDate.Day == date.Day);
 
-    //     return await queryable.ToListAsync();
-    // } 
+        var _events = ProjectToGetEventsResponseDTO(queryable);
+
+                if (_events is not null)
+        {
+            return new GetEventsResponse
+                {
+                    events = await _events
+                };
+        }
+        else
+        {
+            throw new Exception("No event was found with date " + date.Date.ToString());
+        }
+    }
+
+    private Task<List<GetEventsResponse.Event>> ProjectToGetEventsResponseDTO(IQueryable<Event> queryable)
+    {
+        return queryable.Select(e => new GetEventsResponse.Event
+            {
+                EventID = e.EventID,
+                Name = e.Name,
+                StartDate = e.StartDate,
+                EndDate = e.EndDate
+            }).ToListAsync();
+    } 
 }

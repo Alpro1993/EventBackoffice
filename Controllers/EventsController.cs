@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EventBackofficeBackend.Models.DTOs.Event;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Repositories;
+using System.Globalization;
 
 namespace EventBackofficeBackend.Controllers
 {
@@ -26,89 +27,66 @@ namespace EventBackofficeBackend.Controllers
 
         // GET: api/Events
         [HttpGet]
-        public async Task<ActionResult<GetEventsResponse>> GetEvents()
+        public async Task<ActionResult<GetEventsResponse>> GetEvents
+            (
+                [FromQuery(Name = "venue")] int venueId = 0, 
+                [FromQuery(Name = "date")] string date = null
+            )
         {
-            return await repository.GetEventsAsync();
+            //TEMPORARY SOLUTION, WILL BE REPLACED
+            if (venueId is 0 && date is null)
+            {
+                return await repository.GetEventsAsync();
+            }
+            else if (venueId is not 0 && date is null)
+            {
+                return await repository.GetEventsByVenue((int)venueId);
+            } else if (date is not null)
+            {
+                return await repository.GetEventsByDate(
+                    DateTime.ParseExact(date, "dd/MM/yyyy", new CultureInfo("pt-PT")));
+            } else
+            {
+                throw new Exception("Error getting events");
+            }
         }
 
-        // // GET: api/Events/5
-        // [HttpGet("{id}")]
-        // public async Task<ActionResult<Event>> GetEventById(int id)
-        // {
-        //     return await repository.GetEventByIdAsync(id);
-        // }
+        // GET: api/Events/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetSingleEventResponse>> GetEventById(int id)
+        {
+            return await repository.GetEventByIdAsync(id);
+        }
 
-        // public async Task<ActionResult<List<Event>>> GetEventsByVenueId([FromQuery(Name = "venue")] int venueId)
-        // {
-        //     return await repository.GetEventsByVenue(venueId);
-        // }
-
-        // public async Task<ActionResult<List<Event>>> GetEventsByDate([FromQuery(Name = "date")] DateTime date)
-        // {
-        //     return await repository.GetEventsByDate(date);
-        // }
-
-        // PUT: api/Events/5
+        // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPatch("{id}")]
-        // public async Task<IActionResult> PatchEvent(int id, Event @event)
-        // {
-        //     if (id != @event.EventID)
-        //     {
-        //         return BadRequest();
-        //     }
+        [HttpPost]
+        public async Task<ActionResult<PostEventResponse>> PostEvent
+            (   string Name,
+                string StartDate,
+                string EndDate)
+        {
+            var request = new PostEventRequest {
+                Name = Name,
+                StartDate = StartDate,
+                EndDate = EndDate
+            };
 
-        //     _context.Entry(@event).State = EntityState.Modified;
+            return await repository.CreateAsync(request);
+        }
 
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!EventExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
+        // DELETE: api/Events/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            await repository.DeleteAsync(id);
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
 
-        // // POST: api/Events
-        // // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPost]
-        // public async Task<ActionResult<Event>> PostEvent(Event @event)
-        // {
-        //     _context.Events.Add(@event);
-        //     await _context.SaveChangesAsync();
-
-        //     return CreatedAtAction("GetEvent", new { id = @event.EventID }, @event);
-        // }
-
-        // // DELETE: api/Events/5
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteEvent(int id)
-        // {
-        //     var @event = await _context.Events.FindAsync(id);
-        //     if (@event == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     _context.Events.Remove(@event);
-        //     await _context.SaveChangesAsync();
-
-        //     return NoContent();
-        // }
-
-        // private bool EventExists(int id)
-        // {
-        //     return _context.Events.Any(e => e.EventID == id);
-        // }
+        private bool EventExists(int id)
+        {
+            return _context.Events.Any(e => e.EventID == id);
+        }
     }
 }
