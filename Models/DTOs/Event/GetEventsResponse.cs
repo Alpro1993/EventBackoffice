@@ -14,5 +14,5 @@ public class GetEventsResponse
         public DateTime StartDate {get; set;} = default!;
         public DateTime EndDate {get; set;} = default!;
     }
-    public List<Event> events {get; set;} = default!;
+    public List<Event> Events {get; set;} = default!;
 }

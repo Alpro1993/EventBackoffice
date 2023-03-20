@@ -7,5 +7,5 @@ namespace EventBackofficeBackend.Models.DTOs.Event;
 [Serializable]
 public class GetSingleEventRequest
 {
-    public int id {get; set;} = default!;
+    public int Id {get; set;} = default!;
 }

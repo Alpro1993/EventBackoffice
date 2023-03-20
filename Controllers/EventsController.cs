@@ -29,26 +29,16 @@ namespace EventBackofficeBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<GetEventsResponse>> GetEvents
             (
-                [FromQuery(Name = "venue")] int venueId = 0, 
-                [FromQuery(Name = "date")] string date = null
+                [FromQuery(Name = "venue")] int _venueId = 0, 
+                [FromQuery(Name = "date")] string _date = null
             )
         {
-            //TEMPORARY SOLUTION, WILL BE REPLACED
-            if (venueId is 0 && date is null)
-            {
-                return await repository.GetEventsAsync();
-            }
-            else if (venueId is not 0 && date is null)
-            {
-                return await repository.GetEventsByVenue((int)venueId);
-            } else if (date is not null)
-            {
-                return await repository.GetEventsByDate(
-                    DateTime.ParseExact(date, "dd/MM/yyyy", new CultureInfo("pt-PT")));
-            } else
-            {
-                throw new Exception("Error getting events");
-            }
+            //Create the request object and validate the parameters
+            ValidateParameters(_venueId, _date);
+            var request = new GetEventsRequest {VenueId = _venueId, Date = _date};
+            
+            //Pass the request object to the repository and retrieve the response object.
+            return await repository.GetEventsAsync(request);        
         }
 
         // GET: api/Events/5
@@ -84,9 +74,26 @@ namespace EventBackofficeBackend.Controllers
             return NoContent();
         }
 
-        private bool EventExists(int id)
+        //AUXILIARY METHODS
+        private void ValidateParameters(int _venueId, string _date)
         {
-            return _context.Events.Any(e => e.EventID == id);
+            if (_venueId <= 0) 
+            {
+                throw new ArgumentOutOfRangeException("venueId", "Venue Id must be greater than zero");
+            }
+
+            if (_date is not null)
+            {
+                try
+                {
+                    DateTime.ParseExact(_date, "dd/MM/yyyy", new CultureInfo("pt-PT"));
+                }
+                catch (FormatException e)
+                {
+                    throw new ArgumentException(e.GetBaseException().ToString());
+                }
+            }
         }
+
     }
 }

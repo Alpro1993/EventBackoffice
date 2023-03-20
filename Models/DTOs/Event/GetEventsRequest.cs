@@ -8,6 +8,6 @@ namespace EventBackofficeBackend.Models.DTOs.Event;
 [Serializable]
 public class GetEventsRequest
 {
-    public DateTime date {get; set;} = default!;
-    public Venue venue {get;set;} = default!;       
+    public string Date {get; set;} = default!;
+    public int VenueId {get;set;} = default!;       
 }

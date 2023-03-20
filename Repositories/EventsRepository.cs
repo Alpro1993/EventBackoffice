@@ -40,7 +40,7 @@ public class EventsRepository
         await _context.SaveChangesAsync();
 
         return new PostEventResponse {
-            eventID = @event.EventID 
+            EventID = @event.EventID 
         };
     }
 
@@ -68,20 +68,28 @@ public class EventsRepository
     }
 
     //GET METHODS
-    public async Task<GetEventsResponse> GetEventsAsync()
+    public async Task<GetEventsResponse> GetEventsAsync(GetEventsRequest request)
     {
-        var queryable = _context.Events.AsQueryable();
+        var query = _context.Events.AsQueryable();
 
-        var _events = queryable.Select(e => new GetEventsResponse.Event 
+        //Check the received request and build the query
+        if (request.VenueId > 0)
         {
-            EventID = e.EventID,
-            Name = e.Name,
-            StartDate = e.StartDate,
-            EndDate = e.EndDate
-        }).ToListAsync();
+            query = query.Where(q => q.Venues.Any(x => x.VenueID == request.VenueId));
+        }
+
+        if (request.Date is not null)
+        {
+            var date = DateTime.ParseExact(request.Date, "dd/MM/yyyy", new CultureInfo("pt-PT"));
+            query = query.Where(d => d.StartDate.Year == date.Year 
+                                                    && d.StartDate.Month == date.Month
+                                                    && d.StartDate.Day == date.Day);
+        }
+
+        var _events = ProjectToGetEventsResponseDTO(query);
 
         return new GetEventsResponse {
-            events = await _events
+            Events = await _events
         };
     }
 
@@ -106,51 +114,6 @@ public class EventsRepository
 
     }
 
-
-    public async Task<GetEventsResponse> GetEventsByVenue(int venueId, bool asNoTracking = false)
-    {
-        var queryable = _context.Events
-            .Where(q => q.Venues
-                .Any(x => x.VenueID == venueId)
-            );
-
-        var _events = ProjectToGetEventsResponseDTO(queryable);
-
-        if (_events is not null)
-        {
-            return new GetEventsResponse
-                {
-                    events = await _events
-                };
-        }
-        else
-        {   
-            // Commented out to avoid ISE until I find a better option
-            //throw new Exception("No event was found in Venue with ID " + venueId);
-            return new GetEventsResponse();
-        }
-    }
-
-    public async Task<GetEventsResponse> GetEventsByDate(DateTime date, bool asNoTracking = false)
-    {
-        var queryable = _context.Events.Where(d => d.StartDate.Year == date.Year 
-                                                    && d.StartDate.Month == date.Month
-                                                    && d.StartDate.Day == date.Day);
-
-        var _events = ProjectToGetEventsResponseDTO(queryable);
-
-                if (_events is not null)
-        {
-            return new GetEventsResponse
-                {
-                    events = await _events
-                };
-        }
-        else
-        {
-            throw new Exception("No event was found with date " + date.Date.ToString());
-        }
-    }
 
     private Task<List<GetEventsResponse.Event>> ProjectToGetEventsResponseDTO(IQueryable<Event> queryable)
     {

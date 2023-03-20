@@ -318,3 +318,6 @@ obj/EventBackofficeBackend.csproj.codegeneration.targets
 obj/EventBackofficeBackend.csproj.nuget.dgspec.json
 obj/EventBackofficeBackend.csproj.nuget.g.props
 obj/EventBackofficeBackend.csproj.nuget.g.targets
+EBO.db
+EBO.db-shm
+EBO.db-wal
