@@ -321,3 +321,5 @@ obj/EventBackofficeBackend.csproj.nuget.g.targets
 EBO.db
 EBO.db-shm
 EBO.db-wal
+EBO.db-wal
+.gitignore

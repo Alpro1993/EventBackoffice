@@ -8,5 +8,5 @@ namespace EventBackofficeBackend.Models.DTOs.Event;
 [Serializable]
 public class CreateEventResponse
 {
-    public int EventId {get; set;} = default!;
+    public int EventID {get; set;} = default!;
 }

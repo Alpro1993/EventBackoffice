@@ -9,5 +9,5 @@ namespace EventBackofficeBackend.Models.DTOs.Event;
 public class GetEventsRequest
 {
     public string Date {get; set;} = default!;
-    public int VenueId {get;set;} = default!;       
+    public int VenueID {get;set;} = default!;       
 }

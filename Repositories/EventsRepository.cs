@@ -44,15 +44,32 @@ public class EventsRepository
         };
     }
 
-    // public async Task UpdateAsync(int eventId, Event @event)
-    // {
+    public async Task<PatchEventResult> PatchAsync(PatchEventRequest request)
+    {
 
-    //     if(@event.EventID != eventId) {
-    //         throw new InvalidOperationException();
-    //     }
+        var _event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == request.ID);
+        
+        // Check what field
+        if (request.Name is not null)
+        {
+            _event.Name = request.Name;
+        }
 
+        if (request.StartDate is not null)
+        {
 
-    // }
+            _event.StartDate = DateTime.Parse(request.StartDate);
+        }
+
+        if (request.EndDate is not null)
+        {
+            _event.EndDate = DateTime.Parse(request.EndDate);
+        }
+        
+        await _context.SaveChangesAsync();
+        
+        return new PatchEventResult { ID = _event.EventID};
+    }
 
     public async Task DeleteAsync(int id)
     {
@@ -73,9 +90,9 @@ public class EventsRepository
         var query = _context.Events.AsQueryable();
 
         //Check the received request and build the query
-        if (request.VenueId > 0)
+        if (request.VenueID > 0)
         {
-            query = query.Where(q => q.Venues.Any(x => x.VenueID == request.VenueId));
+            query = query.Where(q => q.Venues.Any(x => x.VenueID == request.VenueID));
         }
 
         if (request.Date is not null)
@@ -124,5 +141,5 @@ public class EventsRepository
                 StartDate = e.StartDate,
                 EndDate = e.EndDate
             }).ToListAsync();
-    } 
+    }
 }
