@@ -9,35 +9,29 @@ public class EventBackofficeBackendContext : DbContext
     {
     }
 
-    public DbSet<Event> Events { get; set; }
-    public DbSet<Speaker> Speakers {get; set;}
-    public DbSet<Paper> Papers {get; set;}
-    public DbSet<Participant> Participants {get; set;}
-    public DbSet<Session> Sessions {get; set;}
-    public DbSet<Sponsor> Sponsors {get; set;}
-    public DbSet<Venue> Venues {get; set;}
-    public DbSet<Room> Rooms {get; set;}
+    public DbSet<Event> Events { get; set; } = default!;
+    public DbSet<Speaker> Speakers {get; set;} = default!;
+    public DbSet<Paper> Papers {get; set;} = default!;
+    public DbSet<Participant> Participants {get; set;} = default!;
+    public DbSet<Session> Sessions {get; set;} = default!;
+    public DbSet<Sponsor> Sponsors {get; set;} = default!;
+    public DbSet<Venue> Venues {get; set;} = default!;
+    public DbSet<Room> Rooms {get; set;} = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Event>()
-            .HasMany(s => s.Sessions)
-            .WithOne(e => e.Event);
+
         modelBuilder.Entity<Event>()
             .HasMany(s => s.Sponsors)
             .WithMany(e => e.Events);
         modelBuilder.Entity<Event>()
             .HasMany(v => v.Venues)
             .WithMany(e => e.Events);
-        modelBuilder.Entity<Event>()
-            .HasMany(s => s.Speakers)
-            .WithOne(e => e.Event);
-        modelBuilder.Entity<Event>()
-            .HasMany(p => p.Participants)
-            .WithOne(e => e.Event);
-        modelBuilder.Entity<Event>()
-            .HasMany(p => p.Papers)
-            .WithOne(e => e.Event);
 
+
+        modelBuilder.Entity<Session>()
+            .HasOne(e => e.Event)
+            .WithMany(s => s.Sessions)
+            .IsRequired();
         modelBuilder.Entity<Session>()
             .HasMany(s => s.Speakers)
             .WithMany(s => s.Sessions);
@@ -56,17 +50,37 @@ public class EventBackofficeBackendContext : DbContext
         modelBuilder.Entity<Session>()
             .HasOne(v => v.Venue)
             .WithMany(s => s.Sessions);
+
         
-        modelBuilder.Entity<Venue>()
-            .HasMany(r => r.Rooms)
-            .WithOne(v => v.Venue);
+        modelBuilder.Entity<Room>()
+            .HasOne(v => v.Venue)
+            .WithMany(r => r.Rooms)
+            .IsRequired();
+
         
         modelBuilder.Entity<Paper>()
+            .HasOne(e => e.Event)
+            .WithMany(p => p.Papers)
+            .IsRequired();
+        modelBuilder.Entity<Paper>()
             .HasOne(a => a.MainAuthor)
-            .WithMany(p => p.Papers);
+            .WithMany(p => p.Papers)
+            .IsRequired();
         modelBuilder.Entity<Paper>()
             .HasOne(p => p.Presenter)
             .WithMany(p => p.Presenting);
+
+
+        modelBuilder.Entity<Speaker>()
+            .HasOne(e => e.Event)
+            .WithMany(s => s.Speakers)
+            .IsRequired();
+
+
+        modelBuilder.Entity<Participant>()
+            .HasOne(e => e.Event)
+            .WithMany(p => p.Participants)
+            .IsRequired();
             
     }
 }

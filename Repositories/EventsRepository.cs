@@ -14,12 +14,12 @@ namespace EventBackofficeBackend.Repositories;
 
 public class EventsRepository
 {
-    private readonly EventBackofficeBackendContext _context;
+    public required EventBackofficeBackendContext _context;
 
-    public EventsRepository(EventBackofficeBackendContext context) 
-    {
-        _context = context;
-    }
+    // public EventsRepository(EventBackofficeBackendContext context) 
+    // {
+    //     _context = context;
+    // }
 
     public async Task<PostEventResponse> CreateAsync(PostEventRequest request) 
     {
@@ -44,11 +44,16 @@ public class EventsRepository
         };
     }
 
-    public async Task<PatchEventResult> PatchAsync(PatchEventRequest request)
+    public async Task<PatchEventResponse> PatchAsync(PatchEventRequest request)
     {
 
         var _event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == request.ID);
         
+        if (_event is null)
+        {
+            throw new ArgumentNullException("Events DBSet not found");
+        }
+
         // Check what field
         if (request.Name is not null)
         {
@@ -68,7 +73,7 @@ public class EventsRepository
         
         await _context.SaveChangesAsync();
         
-        return new PatchEventResult { ID = _event.EventID};
+        return new PatchEventResponse { ID = _event.EventID};
     }
 
     public async Task DeleteAsync(int id)
@@ -103,11 +108,7 @@ public class EventsRepository
                                                     && d.StartDate.Day == date.Day);
         }
 
-        var _events = ProjectToGetEventsResponseDTO(query);
-
-        return new GetEventsResponse {
-            Events = await _events
-        };
+        return await ProjectToGetEventsResponseDTO(query);
     }
 
     public async Task<GetSingleEventResponse> GetEventByIdAsync(int id)
@@ -132,14 +133,16 @@ public class EventsRepository
     }
 
 
-    private Task<List<GetEventsResponse.Event>> ProjectToGetEventsResponseDTO(IQueryable<Event> queryable)
+    private async Task<GetEventsResponse> ProjectToGetEventsResponseDTO(IQueryable<Event> queryable)
     {
-        return queryable.Select(e => new GetEventsResponse.Event
+        var _events = await queryable.Select(e => new GetEventsResponse.Event
             {
                 EventID = e.EventID,
                 Name = e.Name,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate
             }).ToListAsync();
+
+        return new GetEventsResponse { Events = _events};
     }
 }

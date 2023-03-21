@@ -323,3 +323,4 @@ EBO.db-shm
 EBO.db-wal
 EBO.db-wal
 .gitignore
+EBO.db

@@ -9,19 +9,21 @@ public class Sponsor
     public int SponsorID {get; set;}
 
     //Properties
-    public required string Name {get; set;}
+    [Required]
+    [StringLength(50, MinimumLength = 2)]
+    public string Name {get; set;} = default!;
     [Url]
-    public string Logo {get; set;}
-    public int FloorSpace {get; set;}
+    public string Logo {get; set;} = default!;
+    public int FloorSpace {get; set;} = default;
     [Url]
-    public string URL {get; set;}
+    public string URL {get; set;} = default!;
 
     //Relationships
 
     //One-to-many
-    public ICollection<Person> Representatives {get; set;}
-    public ICollection<Session> Sessions {get; set;}
+    public ICollection<Person> Representatives {get; set;} = new List<Person>();
+    public ICollection<Session> Sessions {get; set;} = new List<Session>();
 
     //Many-to-many
-    public ICollection<Event> Events {get; set;}
+    public ICollection<Event> Events {get; set;} = new List<Event>();
 }

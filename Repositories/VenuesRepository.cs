@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
 public class VenuesRepository
 {
     private readonly EventBackofficeBackendContext _context;
@@ -20,7 +20,7 @@ public class VenuesRepository
 
     public async Task CreateAsync(Venue venue) 
     {
-        if (venue.VenueID is not 0) 
+        if (venue.VenueID != 0) 
         {
             throw new InvalidOperationException();
         }
@@ -43,14 +43,14 @@ public class VenuesRepository
 
     public async Task<Venue> GetVenueByIdAsync(int id, bool asNoTracking = false)
     {
-        var queryable = _context.Venues.AsQueryable();
+        var venues = _context.Venues;
 
-        if (asNoTracking)
+        if (venues is not null)
         {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.VenueID == id);
+            var venue = await venues.FirstOrDefaultAsync(s => s.VenueID == id);
+            return venue ?? throw new ArgumentException("No venue found with ID " + id);  
         }
-
-        return await queryable.FirstOrDefaultAsync(s => s.VenueID == id); 
+        else throw new Exception("DBSet Venues is null");
     }
 
     public async Task DeleteAsync(int id)

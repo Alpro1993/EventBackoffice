@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
 public class SpeakersRepository
 {
     private readonly EventBackofficeBackendContext _context;
@@ -20,7 +20,7 @@ public class SpeakersRepository
 
     public async Task CreateAsync(Speaker speaker) 
     {
-        if (speaker.PersonID is not 0) 
+        if (speaker.PersonID != 0) 
         {
             throw new InvalidOperationException();
         }
@@ -41,16 +41,19 @@ public class SpeakersRepository
         return await queryable.ToListAsync();
     }
 
-    public async Task<Speaker> GetSpeakerByIdAsync(int id, bool asNoTracking = false)
+    public async Task<Speaker> GetSpeakerByIdAsync(int id)
     {
-        var queryable = _context.Speakers.AsQueryable();
+        var speakers = _context.Speakers;
 
-        if (asNoTracking)
+        if (speakers is not null)
         {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.PersonID == id);
+            var speaker = await speakers.FirstOrDefaultAsync(s => s.PersonID == id);
+            return speaker ?? throw new ArgumentException("No speaker found with ID " + id); 
         }
-
-        return await queryable.FirstOrDefaultAsync(s => s.PersonID == id); 
+        else
+        {
+            throw new Exception("DBSet Speakers is null");
+        } 
     }
 
     public async Task DeleteAsync(int id)

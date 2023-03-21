@@ -9,14 +9,16 @@ public class Venue
     public int VenueID {get; set;}
 
     // Properties
-    public required string Name {get; set;}
+    [Required]
+    [StringLength(150, MinimumLength = 2)]
+    public string Name {get; set;} = default!;
     [Url]
-    public string Location {get; set;}
+    public string Location {get; set;} = default!;
 
     //Relationships
 
     //One-to-many
-    public ICollection<Room> Rooms;
-    public ICollection<Event> Events;
-    public ICollection<Session> Sessions;      
+    public ICollection<Room> Rooms = new List<Room>();
+    public ICollection<Event> Events = new List<Event>();
+    public ICollection<Session> Sessions = new List<Session>();      
 }

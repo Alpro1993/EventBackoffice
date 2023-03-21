@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
     public class ParticipantsRepository
     {
-        private readonly EventBackofficeBackendContext _context;
+        public required EventBackofficeBackendContext _context;
 
         public ParticipantsRepository(EventBackofficeBackendContext context) 
         {
@@ -20,7 +20,7 @@ namespace EventBackofficeBackend.Repository;
 
         public async Task CreateAsync(Participant participant) 
         {
-            if (participant.PersonID is not 0) 
+            if (participant.PersonID != 0) 
             {
                 throw new InvalidOperationException();
             }
@@ -42,25 +42,15 @@ namespace EventBackofficeBackend.Repository;
         }
 
         public async Task<Participant> GetParticipantByIdAsync(int id, bool asNoTracking = false)
-        {
-            var queryable = _context.Participants.AsQueryable();
-
-            if (asNoTracking)
-            {
-                return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.PersonID == id);
-            }
-
-            return await queryable.FirstOrDefaultAsync(s => s.PersonID == id); 
+        { 
+            return await _context.Participants.FirstOrDefaultAsync(s => s.PersonID == id) 
+                    ?? throw new ArgumentException("No participant found with ID " + id);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var participant = await _context.Participants.FirstOrDefaultAsync(s => s.PersonID == id);
-
-            if (participant is null)
-            {
-                throw new InvalidOperationException();
-            }
+            var participant = await _context.Participants.FirstOrDefaultAsync(s => s.PersonID == id)
+                                ?? throw new ArgumentException("No participant found with ID " + id);
 
             _context.Participants.Remove(participant);
             await _context.SaveChangesAsync();

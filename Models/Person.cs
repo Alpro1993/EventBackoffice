@@ -9,16 +9,19 @@ public class Person
     public int PersonID {get; set;}
     
     // Properties
-    public string Name {get; set;}
+    [Required]
+    [StringLength(747, MinimumLength = 2)]
+    public string Name {get; set;} = default!;
     [Url]
-    public string Picture {get; set;}
-    public string Bio {get; set;}
+    public string Picture {get; set;} = default!;
+    [StringLength(747, MinimumLength = 2)]
+    public string Bio {get; set;} = default!;
     [EmailAddress]
-    public string Email {get; set;}
+    public string Email {get; set;} = default!;
 
     // Relationships
 
     // One-to-many
-    public ICollection<Paper> Papers;
-    public ICollection<Paper> Presenting;
+    public ICollection<Paper> Papers = new List<Paper>();
+    public ICollection<Paper> Presenting = new List<Paper>();
 }

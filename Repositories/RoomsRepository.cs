@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
     public class RoomsRepository
     {
-        private readonly EventBackofficeBackendContext _context;
+        public required EventBackofficeBackendContext _context;
 
         public RoomsRepository(EventBackofficeBackendContext context) 
         {
@@ -20,7 +20,7 @@ namespace EventBackofficeBackend.Repository;
 
         public async Task CreateAsync(Room room) 
         {
-            if (room.RoomID is not 0) 
+            if (room.RoomID != 0) 
             {
                 throw new InvalidOperationException();
             }
@@ -43,14 +43,9 @@ namespace EventBackofficeBackend.Repository;
 
         public async Task<Room> GetRoomByIdAsync(int id, bool asNoTracking = false)
         {
-            var queryable = _context.Rooms.AsQueryable();
-
-            if (asNoTracking)
-            {
-                return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.RoomID == id);
-            }
-
-            return await queryable.FirstOrDefaultAsync(s => s.RoomID == id); 
+  
+                return await _context.Rooms.FirstOrDefaultAsync(s => s.RoomID == id) 
+                        ?? throw new ArgumentException("No room found with ID " + id);
         }
 
         public async Task DeleteAsync(int id)

@@ -1,57 +1,60 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
+using EventBackofficeBackend.Models.DTOs.Session;
+using EventBackofficeBackend.Repositories.ExtensionMethods;
 
-namespace EventBackofficeBackend.Repository;
+using System.Globalization;
+
+
+namespace EventBackofficeBackend.Repositories;
+
 public class SessionsRepository
 {
-    private readonly EventBackofficeBackendContext _context;
+    public required EventBackofficeBackendContext _context;
 
-    public SessionsRepository(EventBackofficeBackendContext context) 
+    public SessionsRepository() {}
+
+    public async Task<PostSessionResponse> CreateAsync(PostSessionRequest request) 
     {
-        _context = context;
-    }
+        Session _session = new Session
+            {
+                Name = request.Name,
+                StartDate = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT")),
+                EndDate = DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", new CultureInfo("pt-PT"))
+            };
 
-    public async Task CreateAsync(Session session) 
-    {
-        if (session.SessionID is not 0) 
-        {
-            throw new InvalidOperationException();
-        }
-
-        await _context.AddAsync(session);
+        await _context.AddAsync(_session);
         await _context.SaveChangesAsync();
+
+        return new PostSessionResponse { ID = _session.SessionID};
     }
 
-    public async Task<List<Session>> GetSessionsByEvent(int eventId, bool asNoTracking = false)
+    public async Task<PatchSessionResponse> PatchAsync(PatchSessionRequest request)
     {
-        var queryable = _context.Sessions.Where(e => e.EventID == eventId).AsQueryable();
-        
-        if (asNoTracking)
+        var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
+
+        if (session is null)
         {
-            return await queryable.AsNoTracking().ToListAsync();
+            throw new ArgumentException("No session found with ID " + request.ID);
+        }
+        if (request.Name is not null)
+        {
+            session.Name = request.Name;
+        }
+        if (request.StartDate is not null)
+        {
+            session.StartDate = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT"));
+        }
+        if (request.EndDate is not null)
+        {
+            session.EndDate = DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", new CultureInfo("pt-PT"));
         }
         
-        return await queryable.ToListAsync();
-    }
+        await _context.SaveChangesAsync();
 
-    public async Task<Session> GetSessionById(int id, bool asNoTracking = false)
-    {
-        var queryable = _context.Sessions.AsQueryable();
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.SessionID == id);
-        }
-
-        return await queryable.FirstOrDefaultAsync(s => s.SessionID == id); 
+        return new PatchSessionResponse { ID = session.SessionID };
     }
 
     public async Task DeleteAsync(int id)
@@ -67,103 +70,77 @@ public class SessionsRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<Session>> GetParentlessSessions(int eventId, bool asNoTracking = false)
+
+    public async Task<GetSingleSessionResponse> GetSessionById(GetSingleSessionRequest request)
     {
-        var queryable = _context.Sessions.AsQueryable()
-                        .Where(e => e.EventID == eventId)
-                        .Where(s => s.parentSession == null)
-                        .AsQueryable();
+        var _session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
 
-        if (asNoTracking)
+        if (_session is null)
         {
-            return await queryable.AsNoTracking().ToListAsync();
+            throw new ArgumentException("No session found with ID " + request.ID);
         }
-
-        return await queryable.ToListAsync();        
+        return new GetSingleSessionResponse {
+            ID = _session.SessionID,
+            Name = _session.Name,
+            StartDate = _session.StartDate
+        }; 
     }
 
-    public async Task<List<Session>> GetChildSessions(int eventId, int sessionId, bool asNoTracking = false)
+    public async Task<GetSessionsResponse> GetSessionsAsync(GetSessionsRequest request)
     {
-        var queryable = _context.Sessions
-                        .Where(e => e.EventID == eventId)
-                        .Where(s => s.parentSession.SessionID == sessionId);
+        var query = _context.Sessions.AsQueryable();
 
-        if (asNoTracking)
+        //Check the received request and build the query
+        if (request.EventID > 0)
         {
-            return await queryable.AsNoTracking().ToListAsync();
+            query = query.Where(e => e.EventID == request.EventID);
         }
 
-        return await queryable.ToListAsync();
+        if (request.SpeakerID > 0)
+        {
+            query = query.Where(s => s.Speakers.Any(x => x.PersonID == request.SpeakerID));
+        }
+
+        if (request.VenueID > 0)
+        {
+            // query = query.QuerySessionsByVenueId(request.VenueID);
+            query = query.Where(s => s.VenueID == request.VenueID);
+        }
+        if (request.StartDate is not null)
+        {
+            var date = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT"));
+            query = query.Where(d => d.StartDate.Year == date.Year 
+                                                    && d.StartDate.Month == date.Month
+                                                    && d.StartDate.Day == date.Day);
+        }
+
+        if (request.ParentID > 0)
+        {
+            query = query.Where(s => s.parentSessionID == request.ParentID);
+        }
+
+        if (request.onlyParentlessSessions is true)
+        {
+            query = query.Where(s => s.parentSessionID > 0);
+        }
+
+        if (request.SponsorID > 0)
+        {
+            query = query.Where(s => s.Sponsors.Any(i => i.SponsorID == request.SponsorID));
+        }
+
+        return await ProjectToGetSessionsResponseDTO(query);
     }
 
-    public async Task<List<Session>> GetChildSessionsByParentId(int id, bool asNoTracking = false)
+    private async Task<GetSessionsResponse> ProjectToGetSessionsResponseDTO(IQueryable<Session> queryable)
     {
-        var queryable = _context.Sessions.Where(s => s.parentSession.SessionID == id);
-
-            if (asNoTracking)
+            var _sessions = await queryable.Select(s => new GetSessionsResponse.Session
             {
-                return await queryable.AsNoTracking().ToListAsync();
-            }
+                SessionID = s.SessionID,
+                Name = s.Name,
+                StartDate = s.StartDate,
+            }).ToListAsync();
 
-            return await queryable.ToListAsync();
-    }
-
-    public async Task<List<Session>> GetSessionsBySponsorId(int eventId, int sponsorId, bool asNoTracking = false)
-    {
-        var queryable = _context.Sessions
-                        .Where(e => e.EventID == eventId)
-                        .Where(s => s.Sponsors.Any(i => i.SponsorID == sponsorId));
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().ToListAsync();
-        }
-
-        return await queryable.ToListAsync();
-    }
-
-    public async Task<List<Session>> GetSessionsVenueId(int eventId, int venueId, bool asNoTracking = false) 
-    {
-        var queryable = _context.Sessions
-                        .Where(e => e.EventID == eventId)
-                        .Where(s => s.VenueID == venueId);
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().ToListAsync();
-        }
-
-        return await queryable.ToListAsync();
-    }
-
-    public async Task<List<Session>> GetSessionsSpeakerId(int eventId, int speakerId, bool asNoTracking = false)
-    {
-        var queryable = _context.Sessions
-                        .Where(e => e.EventID == eventId)
-                        .Where(s => s.Speakers.Any(x => x.PersonID == speakerId));
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().ToListAsync();
-        }
-
-        return await queryable.ToListAsync();
-        
-    }
-
-    public async Task<List<Session>> GetSessionsByDate(int eventId, DateTime date, bool asNoTracking = false)
-    {
-        var queryable = _context.Sessions
-        .Where(e => e.EventID == eventId)
-        .Where(s => s.StartDate.Year == date.Year
-                && s.StartDate.Month == date.Month
-                && s.StartDate.Day == date.Day);
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().ToListAsync();
-        }
-
-        return await queryable.ToListAsync();
+        return new GetSessionsResponse { Sessions = _sessions};
     }
 }

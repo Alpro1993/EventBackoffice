@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
 public class SponsorsRepository
 {
     private readonly EventBackofficeBackendContext _context;
@@ -20,7 +20,7 @@ public class SponsorsRepository
 
     public async Task CreateAsync(Sponsor sponsor) 
     {
-        if (sponsor.SponsorID is not 0) 
+        if (sponsor.SponsorID != 0) 
         {
             throw new InvalidOperationException();
         }
@@ -41,16 +41,16 @@ public class SponsorsRepository
         return await queryable.ToListAsync();
     }
 
-    public async Task<Sponsor> GetSponsorByIdAsync(int id, bool asNoTracking = false)
+    public async Task<Sponsor> GetSponsorByIdAsync(int id)
     {
-        var queryable = _context.Sponsors.AsQueryable();
+        var sponsors = _context.Sponsors;
 
-        if (asNoTracking)
+        if (sponsors is not null)
         {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.SponsorID == id);
+            var sponsor = await sponsors.FirstOrDefaultAsync(s => s.SponsorID == id); 
+            return sponsor ?? throw new ArgumentException("No sponsor found with ID " + id);
         }
-
-        return await queryable.FirstOrDefaultAsync(s => s.SponsorID == id); 
+        else throw new Exception("DBSet Sponsors is null");
     }
 
     public async Task DeleteAsync(int id)

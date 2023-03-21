@@ -67,127 +67,85 @@ public static class DbInitializer
         context.Rooms.AddRange(rooms);
         context.SaveChanges();
 
-        // var sponsors = new List<Sponsor> {
-        //     new Sponsor
-        //     {
-        //         Name = "ABC Corp",
-        //         Logo = "https://www.example.com/abc-logo.png",
-        //         FloorSpace = 100,
-        //         URL = "https://www.example.com/abc",
-        //         Representatives = new List<Person>
-        //         {
-        //             new Person
-        //             {
-        //                 Name = "John Smith",
-        //                 Picture = "https://www.example.com/john-smith.png",
-        //                 Bio = "John is a marketing executive at ABC Corp",
-        //                 Email = "john.smith@example.com"
-        //             },
-        //             new Person
-        //             {
-        //                 Name = "Jane Doe",
-        //                 Picture = "https://www.example.com/jane-doe.png",
-        //                 Bio = "Jane is a sales executive at ABC Corp",
-        //                 Email = "jane.doe@example.com"
-        //             }
-        //         },
-        //         Sessions = new List<Session>
-        //         {
-        //             new Session
-        //             {
-        //                 Name = "ABC Corp Presentation",
-        //                 StartDate = new DateTime(2023, 04, 01, 10, 00, 00),
-        //                 EndDate = new DateTime(2023, 04, 01, 11, 00, 00),
-        //                 EventID = events[0].EventID
-        //             }
-        //         }
-        //     },
-        //     new Sponsor
-        //     {
-        //         Name = "XYZ Inc",
-        //         Logo = "https://www.example.com/xyz-logo.png",
-        //         FloorSpace = 50,
-        //         URL = "https://www.example.com/xyz",
-        //         Representatives = new List<Person>
-        //         {
-        //             new Person
-        //             {
-        //                 Name = "Bob Johnson",
-        //                 Picture = "https://www.example.com/bob-johnson.png",
-        //                 Bio = "Bob is a marketing executive at XYZ Inc",
-        //                 Email = "bob.johnson@example.com"
-        //             }
-        //         },
-        //         Sessions = new List<Session>
-        //         {
-        //             new Session
-        //             {
-        //                 Name = "XYZ Inc Presentation",
-        //                 StartDate = new DateTime(2023, 04, 01, 14, 00, 00),
-        //                 EndDate = new DateTime(2023, 04, 01, 15, 00, 00),
-        //                 EventID = events[0].EventID
-        //             }
-        //         }
-        //     }
-        // };
+        var sponsors = new List<Sponsor> {
+            new Sponsor
+            {
+                Name = "ABC Corp",
+                Logo = "https://www.example.com/abc-logo.png",
+                FloorSpace = 100,
+                URL = "https://www.example.com/abc",
+                Representatives = new List<Person>
+                {
+                    new Person
+                    {
+                        Name = "John Smith",
+                        Picture = "https://www.example.com/john-smith.png",
+                        Bio = "John is a marketing executive at ABC Corp",
+                        Email = "john.smith@example.com"
+                    },
+                    new Person
+                    {
+                        Name = "Jane Doe",
+                        Picture = "https://www.example.com/jane-doe.png",
+                        Bio = "Jane is a sales executive at ABC Corp",
+                        Email = "jane.doe@example.com"
+                    }
+                }
+            },
+            new Sponsor
+            {
+                Name = "XYZ Inc",
+                Logo = "https://www.example.com/xyz-logo.png",
+                FloorSpace = 50,
+                URL = "https://www.example.com/xyz",
+                Representatives = new List<Person>
+                {
+                    new Person
+                    {
+                        Name = "Bob Johnson",
+                        Picture = "https://www.example.com/bob-johnson.png",
+                        Bio = "Bob is a marketing executive at XYZ Inc",
+                        Email = "bob.johnson@example.com"
+                    }
+                }
+            }
+        };
 
-        // context.Sponsors.AddRange(sponsors);
-        // context.SaveChanges();
+        context.Sponsors.AddRange(sponsors);
+        context.SaveChanges();
         
-        // var sessions = new List<Session>
-        // {
-        //     new Session
-        //     {
-        //         Name = "Opening Keynote",
-        //         StartDate = DateTime.Parse("2023-05-01 09:00:00"),
-        //         EndDate = DateTime.Parse("2023-05-01 10:00:00"),
-        //         Room = rooms[0],
-        //         Sponsors = new List<Sponsor>() {sponsors[0]},
-        //         EventID = events[0].EventID,
-        //         Speakers = new List<Speaker>
-        //         {
-        //             new Speaker { Name = "John Smith", Email = "john.smith@example.com" },
-        //             new Speaker { Name = "Jane Doe", Email = "jane.doe@example.com" }
-        //         },
-        //         Papers = new List<Paper>
-        //         {
-        //             new Paper { Title = "The Future of AI", File = "https://example.com/future-of-ai.pdf" }
-        //         }
-        //     },
-        //     new Session
-        //     {
-        //         Name = "Lunch Break",
-        //         StartDate = DateTime.Parse("2023-05-01 12:00:00"),
-        //         EndDate = DateTime.Parse("2023-05-01 13:00:00"),
-        //         Room = rooms[2],
-        //         EventID = events[0].EventID,
-        //         Sponsors = new List<Sponsor>() {sponsors[0], sponsors[1]},
-        //         Speakers = new List<Speaker>(),
-        //         Papers = new List<Paper>()
-        //     },
-        //     new Session
-        //     {
-        //         Name = "Closing Keynote",
-        //         StartDate = DateTime.Parse("2023-05-01 17:00:00"),
-        //         EndDate = DateTime.Parse("2023-05-01 18:00:00"),
-        //         Room = rooms[0],
-        //         EventID = events[0].EventID,
-        //         Sponsors = new List<Sponsor>(),
-        //         Speakers = new List<Speaker>
-        //         {
-        //             new Speaker { Name = "Bob Johnson", Email = "bob.johnson@example.com" }
-        //         },
-        //         Papers = new List<Paper>
-        //         {
-        //             new Paper { Title = "The Future of Space Exploration", File = "https://example.com/future-of-space.pdf" }
-        //         }
-        //     }
-        // };
+        var sessions = new List<Session>
+        {
+            new Session
+            {
+                Name = "Opening Keynote",
+                StartDate = DateTime.Parse("2023-05-01 09:00:00"),
+                EndDate = DateTime.Parse("2023-05-01 10:00:00"),
+                Room = rooms[0],
+                EventID = events[0].EventID
+            },
+            new Session
+            {
+                Name = "Lunch Break",
+                StartDate = DateTime.Parse("2023-05-01 12:00:00"),
+                EndDate = DateTime.Parse("2023-05-01 13:00:00"),
+                Room = rooms[2],
+                EventID = events[0].EventID
+            },
+            new Session
+            {
+                Name = "Closing Keynote",
+                StartDate = DateTime.Parse("2023-05-01 17:00:00"),
+                EndDate = DateTime.Parse("2023-05-01 18:00:00"),
+                Room = rooms[0],
+                EventID = events[0].EventID
+            }
+        };
 
-        // foreach (var session in sessions)
-        // {
-        //     context.Sessions.Add(session);
-        // }
+        foreach (var session in sessions)
+        {
+            context.Sessions.Add(session);
+        }
 
         // var subsessions = new List<Session> 
         // {
@@ -198,16 +156,7 @@ public static class DbInitializer
         //         EndDate = DateTime.Parse("2023-05-01 18:00:00"),
         //         Room = rooms[0],
         //         EventID = events[0].EventID,
-        //         Sponsors = new List<Sponsor>(),
-        //         parentSession = sessions[0],
-        //         Speakers = new List<Speaker>
-        //             {
-        //                 new Speaker { Name = "Bob Johnson", Email = "bob.johnson@example.com" }
-        //             },
-        //             Papers = new List<Paper>
-        //             {
-        //                 new Paper { Title = "The Future of Space Exploration", File = "https://example.com/future-of-space.pdf" }
-        //             }
+        //         parentSession = sessions[0]
         //     },
         //     new Session
         //     {
@@ -216,20 +165,7 @@ public static class DbInitializer
         //         EndDate = DateTime.Parse("2023-06-15 15:00:00"),
         //         Room = rooms[1],
         //         EventID = events[0].EventID,
-        //         Sponsors = new List<Sponsor>
-        //         {
-        //             new Sponsor { Name = "ABC Corporation"},
-        //             new Sponsor { Name = "XYZ Corp"}
-        //         },
-        //         parentSession = sessions[2],
-        //         Speakers = new List<Speaker>
-        //         {
-        //             new Speaker { Name = "Amy Lee", Email = "amy.lee@example.com" }
-        //         },
-        //         Papers = new List<Paper>
-        //         {
-        //             new Paper { Title = "The Importance of AI in Business", File = "https://example.com/ai-business.pdf" }
-        //         }
+        //         parentSession = sessions[2]
         //     },
         //     new Session
         //     {
@@ -238,23 +174,12 @@ public static class DbInitializer
         //         EndDate = DateTime.Parse("2023-07-20 11:30:00"),
         //         Room = rooms[2],
         //         EventID = events[0].EventID,
-        //         Sponsors = new List<Sponsor>
-        //         {
-        //             new Sponsor { Name = "GreenTech Corp"}
-        //         },
-        //         parentSession = sessions[1],
-        //         Speakers = new List<Speaker>
-        //         {
-        //             new Speaker { Name = "Dr. Jane Smith", Email = "jane.smith@example.com" },
-        //             new Speaker { Name = "David Lee", Email = "david.lee@example.com" },
-        //             new Speaker { Name = "Maria Garcia", Email = "maria.garcia@example.com" }
-        //         },
-        //         Papers = new List<Paper>()
+        //         parentSession = sessions[1]
         //     }
 
         // };
         // context.AddRange(subsessions);
-        // context.SaveChanges();
+        context.SaveChanges();
 
         // var participants = new List<Participant> {
         //     new Participant 

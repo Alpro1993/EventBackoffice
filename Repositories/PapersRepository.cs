@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Repository;
+namespace EventBackofficeBackend.Repositories;
 
 public class PapersRepository
 {
-    private readonly EventBackofficeBackendContext _context;
+    public required EventBackofficeBackendContext _context;
 
     public PapersRepository(EventBackofficeBackendContext context) 
     {
@@ -21,7 +21,7 @@ public class PapersRepository
 
     public async Task CreateAsync(Paper paper) 
     {
-        if (paper.PaperID is not 0) 
+        if (paper.PaperID != 0) 
         {
             throw new InvalidOperationException();
         }
@@ -42,16 +42,10 @@ public class PapersRepository
         return await queryable.ToListAsync();
     }
 
-    public async Task<Paper> GetPaperByIdAsync(int id, bool asNoTracking = false)
-    {
-        var queryable = _context.Papers.AsQueryable();
-
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().FirstOrDefaultAsync(s => s.PaperID == id);
-        }
-
-        return await queryable.FirstOrDefaultAsync(s => s.PaperID == id); 
+    public async Task<Paper> GetPaperByIdAsync(int id)
+    {  
+            return await _context.Papers.FirstOrDefaultAsync(s => s.PaperID == id) 
+                    ?? throw new ArgumentException("No paper found with ID " + id); 
     }
 
     public async Task DeleteAsync(int id)
