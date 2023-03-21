@@ -1,4 +1,6 @@
 using EventBackofficeBackend.Models;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,16 +76,16 @@ public static class DbInitializer
                 Logo = "https://www.example.com/abc-logo.png",
                 FloorSpace = 100,
                 URL = "https://www.example.com/abc",
-                Representatives = new List<Person>
+                Representatives = new List<Representative>
                 {
-                    new Person
+                    new Representative
                     {
                         Name = "John Smith",
                         Picture = "https://www.example.com/john-smith.png",
                         Bio = "John is a marketing executive at ABC Corp",
                         Email = "john.smith@example.com"
                     },
-                    new Person
+                    new Representative
                     {
                         Name = "Jane Doe",
                         Picture = "https://www.example.com/jane-doe.png",
@@ -98,14 +100,15 @@ public static class DbInitializer
                 Logo = "https://www.example.com/xyz-logo.png",
                 FloorSpace = 50,
                 URL = "https://www.example.com/xyz",
-                Representatives = new List<Person>
+                Representatives = new List<Representative>
                 {
-                    new Person
+                    new Representative
                     {
                         Name = "Bob Johnson",
                         Picture = "https://www.example.com/bob-johnson.png",
                         Bio = "Bob is a marketing executive at XYZ Inc",
-                        Email = "bob.johnson@example.com"
+                        Email = "bob.johnson@example.com",
+                        Event = events[0]
                     }
                 }
             }
@@ -122,7 +125,8 @@ public static class DbInitializer
                 StartDate = DateTime.Parse("2023-05-01 09:00:00"),
                 EndDate = DateTime.Parse("2023-05-01 10:00:00"),
                 Room = rooms[0],
-                EventID = events[0].EventID
+                Venue = venues[0],
+                Event = events[0]
             },
             new Session
             {
@@ -130,7 +134,8 @@ public static class DbInitializer
                 StartDate = DateTime.Parse("2023-05-01 12:00:00"),
                 EndDate = DateTime.Parse("2023-05-01 13:00:00"),
                 Room = rooms[2],
-                EventID = events[0].EventID
+                Venue = venues[1],
+                Event = events[1]
             },
             new Session
             {
@@ -138,80 +143,83 @@ public static class DbInitializer
                 StartDate = DateTime.Parse("2023-05-01 17:00:00"),
                 EndDate = DateTime.Parse("2023-05-01 18:00:00"),
                 Room = rooms[0],
-                EventID = events[0].EventID
+                Venue = venues[0],
+                Event = events[0]
             }
         };
 
-        foreach (var session in sessions)
-        {
-            context.Sessions.Add(session);
-        }
-
-        // var subsessions = new List<Session> 
-        // {
-        //     new Session
-        //     {
-        //         Name = "Closing Keynote",
-        //         StartDate = DateTime.Parse("2023-05-01 17:00:00"),
-        //         EndDate = DateTime.Parse("2023-05-01 18:00:00"),
-        //         Room = rooms[0],
-        //         EventID = events[0].EventID,
-        //         parentSession = sessions[0]
-        //     },
-        //     new Session
-        //     {
-        //         Name = "Keynote Address on Digital Transformation",
-        //         StartDate = DateTime.Parse("2023-06-15 14:00:00"),
-        //         EndDate = DateTime.Parse("2023-06-15 15:00:00"),
-        //         Room = rooms[1],
-        //         EventID = events[0].EventID,
-        //         parentSession = sessions[2]
-        //     },
-        //     new Session
-        //     {
-        //         Name = "Panel Discussion: Climate Change and Sustainability",
-        //         StartDate = DateTime.Parse("2023-07-20 10:00:00"),
-        //         EndDate = DateTime.Parse("2023-07-20 11:30:00"),
-        //         Room = rooms[2],
-        //         EventID = events[0].EventID,
-        //         parentSession = sessions[1]
-        //     }
-
-        // };
-        // context.AddRange(subsessions);
+        context.Sessions.AddRange(sessions);
         context.SaveChanges();
 
-        // var participants = new List<Participant> {
-        //     new Participant 
-        //     {
-        //         Name = "John Doe",
-        //         Email = "johndoe@example.com",
-        //         Picture = "https://example.com/johndoe.jpg",
-        //         Bio = "I am a software engineer with over 10 years of experience.",
-        //         Visible = true,
-        //         Event = events[0]
-        //     },
-        //     new Participant 
-        //     {
-        //         Name = "Jane Smith",
-        //         Email = "janesmith@example.com",
-        //         Picture = "https://example.com/janesmith.jpg",
-        //         Bio = "I am a data analyst with a passion for visualizations.",
-        //         Visible = false,
-        //         Event = events[1]
-        //     },
-        //     new Participant 
-        //     {
-        //         Name = "Bob Johnson",
-        //         Email = "bobjohnson@example.com",
-        //         Picture = "https://example.com/bobjohnson.jpg",
-        //         Bio = "I am a full-stack developer who loves building web applications.",
-        //         Visible = true,
-        //         Event = events[0]
-        //     }
-        // };
+        var subsessions = new List<Session> 
+        {
+            new Session
+            {
+                Name = "Closing Keynote",
+                StartDate = DateTime.Parse("2023-05-01 17:00:00"),
+                EndDate = DateTime.Parse("2023-05-01 18:00:00"),
+                Room = rooms[0],
+                Venue = venues[0],
+                Event = events[0],
+                parentSession = sessions[0]
+            },
+            new Session
+            {
+                Name = "Keynote Address on Digital Transformation",
+                StartDate = DateTime.Parse("2023-06-15 14:00:00"),
+                EndDate = DateTime.Parse("2023-06-15 15:00:00"),
+                Room = rooms[1],
+                Venue = venues[1],
+                Event = events[0],
+                parentSession = sessions[2]
+            },
+            new Session
+            {
+                Name = "Panel Discussion: Climate Change and Sustainability",
+                StartDate = DateTime.Parse("2023-07-20 10:00:00"),
+                EndDate = DateTime.Parse("2023-07-20 11:30:00"),
+                Room = rooms[2],
+                Venue = venues[1],
+                Event = events[0],
+                parentSession = sessions[1]
+            }
 
-        // context.AddRange(participants);
-        // context.SaveChanges();    
+        };
+        context.AddRange(subsessions);
+        context.SaveChanges();
+
+
+        var participants = new List<Participant> {
+            new Participant 
+            {
+                Name = "John Doe",
+                Email = "johndoe@example.com",
+                Picture = "https://example.com/johndoe.jpg",
+                Bio = "I am a software engineer with over 10 years of experience.",
+                Visible = true,
+                Event = events[0]
+            },
+            new Participant 
+            {
+                Name = "Jane Smith",
+                Email = "janesmith@example.com",
+                Picture = "https://example.com/janesmith.jpg",
+                Bio = "I am a data analyst with a passion for visualizations.",
+                Visible = false,
+                Event = events[1]
+            },
+            new Participant 
+            {
+                Name = "Bob Johnson",
+                Email = "bobjohnson@example.com",
+                Picture = "https://example.com/bobjohnson.jpg",
+                Bio = "I am a full-stack developer who loves building web applications.",
+                Visible = true,
+                Event = events[0]
+            }
+        };
+
+        context.AddRange(participants);
+        context.SaveChanges();    
     }
 }

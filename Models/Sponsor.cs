@@ -21,7 +21,7 @@ public class Sponsor
     //Relationships
 
     //One-to-many
-    public ICollection<Person> Representatives {get; set;} = new List<Person>();
+    public ICollection<Representative> Representatives {get; set;} = new List<Representative>();
     public ICollection<Session> Sessions {get; set;} = new List<Session>();
 
     //Many-to-many

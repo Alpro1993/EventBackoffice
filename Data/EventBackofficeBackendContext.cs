@@ -50,6 +50,11 @@ public class EventBackofficeBackendContext : DbContext
         modelBuilder.Entity<Session>()
             .HasOne(v => v.Venue)
             .WithMany(s => s.Sessions);
+        modelBuilder.Entity<Session>()
+            .HasOne(p => p.parentSession)
+            .WithMany(c => c.childSessions)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
 
         
         modelBuilder.Entity<Room>()
@@ -80,6 +85,12 @@ public class EventBackofficeBackendContext : DbContext
         modelBuilder.Entity<Participant>()
             .HasOne(e => e.Event)
             .WithMany(p => p.Participants)
+            .IsRequired();
+
+        
+        modelBuilder.Entity<Representative>()
+            .HasOne(s => s.Sponsor)
+            .WithMany(r => r.Representatives)
             .IsRequired();
             
     }

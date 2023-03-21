@@ -38,6 +38,7 @@ public class Session
     public ICollection<Paper> Papers {get; set;} = new List<Paper>();
 
     // Hierarchical
-    public Session parentSession {get; set;} = default!;
-    public int parentSessionID {get; set;} = default;
+    public Session? parentSession {get; set;} = default!;
+    public int? parentSessionID {get; set;} = default!;
+    public ICollection<Session> childSessions {get; set;} = new List<Session>();
 }
