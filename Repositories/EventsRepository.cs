@@ -9,6 +9,7 @@ using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
 using EventBackofficeBackend.Models.DTOs.Event;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EventBackofficeBackend.Repositories;
 
@@ -21,13 +22,11 @@ public class EventsRepository
     //     _context = context;
     // }
 
-    public async Task<PostEventResponse> CreateAsync(PostEventRequest request) 
+    public async Task<ActionResult> CreateAsync(PostEventRequest request) 
     {
         if (_context.Events.Any(e => e.Name.Equals(request.Name))) 
         {
-            //Commented out to avoid ISE until I find better option
-            //throw new InvalidOperationException("An event with that name already exists");
-            return new PostEventResponse();
+            return new BadRequestObjectResult("An event with that name already exists");
         }
 
         var @event = new Event {
@@ -39,19 +38,17 @@ public class EventsRepository
         await _context.AddAsync(@event);
         await _context.SaveChangesAsync();
 
-        return new PostEventResponse {
-            EventID = @event.EventID 
-        };
+        return new CreatedAtActionResult("Create", "EventsController", @event.EventID, @event.EventID);
     }
 
-    public async Task<PatchEventResponse> PatchAsync(PatchEventRequest request)
+    public async Task<ActionResult> PatchAsync(PatchEventRequest request)
     {
 
         var _event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == request.ID);
         
         if (_event is null)
         {
-            throw new ArgumentNullException("Events DBSet not found");
+            return new BadRequestObjectResult("EventID was not found");
         }
 
         // Check what field
@@ -73,26 +70,32 @@ public class EventsRepository
         
         await _context.SaveChangesAsync();
         
-        return new PatchEventResponse { ID = _event.EventID};
+        return new OkObjectResult(new PatchEventResponse { ID = _event.EventID});
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<ActionResult> DeleteAsync(int id)
     {
         var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
 
         if (@event is null)
         {
-            throw new InvalidOperationException("Event was not found");
+            return new BadRequestObjectResult("Event was not found");
         }
 
         _context.Events.Remove(@event);
         await _context.SaveChangesAsync();
+        return new NoContentResult();
     }
 
     //GET METHODS
-    public async Task<GetEventsResponse> GetEventsAsync(GetEventsRequest request)
+    public async Task<ActionResult> GetEventsAsync(GetEventsRequest request)
     {
         var query = _context.Events.AsQueryable();
+
+        if (request.VenueID is not null && request.VenueID <= 0)
+        {
+            return new BadRequestObjectResult("Bad VenueID");
+        }
 
         //Check the received request and build the query
         if (request.VenueID > 0)
@@ -108,26 +111,24 @@ public class EventsRepository
                                                     && d.StartDate.Day == date.Day);
         }
 
-        return await ProjectToGetEventsResponseDTO(query);
+        return new OkObjectResult(await ProjectToGetEventsResponseDTO(query));
     }
 
-    public async Task<GetSingleEventResponse> GetEventByIdAsync(int id)
+    public async Task<ActionResult> GetEventByIdAsync(int id)
     {
         var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
 
         if (@event is not null)
         {
-            return new GetSingleEventResponse {
+            return new OkObjectResult(new GetSingleEventResponse {
                 EventID = @event.EventID,
                 Name = @event.Name,
                 StartDate = @event.StartDate,
                 EndDate = @event.EndDate
-            };
+            });
         } else 
         {
-            // Commented out to stop ISE until I find better option
-            //throw new InvalidOperationException("Event not found");
-            return new GetSingleEventResponse();
+            return new BadRequestObjectResult("EventID was not found");
         }
 
     }

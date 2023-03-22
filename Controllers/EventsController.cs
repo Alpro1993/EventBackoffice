@@ -20,19 +20,19 @@ namespace EventBackofficeBackend.Controllers
 
         // GET: api/Events
         [HttpGet]
-        public async Task<ActionResult<GetEventsResponse>> GetEvents
+        public async Task<ActionResult> GetEvents
             (
-                int venueId = 0, 
-                string? startDate = null
+                int? venueId, 
+                string? startDate
             )
         {
             //Create the request object and validate the parameters
             var parameters = new Parameters {
                 ID = venueId,
-                StartDate = startDate!
+                StartDate = startDate
             };
             parameters.ValidateParameters();
-            var request = new GetEventsRequest {VenueID = venueId, Date = startDate!};
+            var request = new GetEventsRequest {VenueID = venueId!, Date = startDate!};
             
             //Pass the request object to the repository and retrieve the response object.
             return await repository.GetEventsAsync(request);        
@@ -40,7 +40,7 @@ namespace EventBackofficeBackend.Controllers
 
         // GET: api/Events/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetSingleEventResponse>> GetEventById(int id)
+        public async Task<ActionResult> GetEventById(int id)
         {
             return await repository.GetEventByIdAsync(id);
         }
@@ -48,7 +48,7 @@ namespace EventBackofficeBackend.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostEventResponse>> PostEvent
+        public async Task<ActionResult> PostEvent
             (   string Name,
                 string StartDate,
                 string EndDate)
@@ -64,7 +64,7 @@ namespace EventBackofficeBackend.Controllers
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        public async Task<ActionResult> DeleteEvent(int id)
         {
             await repository.DeleteAsync(id);
 
@@ -73,7 +73,7 @@ namespace EventBackofficeBackend.Controllers
 
         // PATCH: api/Events/5
         [HttpPatch("{id}")]
-        public async Task<PatchEventResponse> PatchEvent
+        public async Task<ActionResult> PatchEvent
             (
                 int id,
                 string? name,

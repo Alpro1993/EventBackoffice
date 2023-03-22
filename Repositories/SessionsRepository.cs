@@ -6,7 +6,7 @@ using EventBackofficeBackend.Models.DTOs.Session;
 using EventBackofficeBackend.Repositories.ExtensionMethods;
 
 using System.Globalization;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace EventBackofficeBackend.Repositories;
 
@@ -16,7 +16,7 @@ public class SessionsRepository
 
     public SessionsRepository() {}
 
-    public async Task<PostSessionResponse> CreateAsync(PostSessionRequest request) 
+    public async Task<ActionResult> CreateAsync(PostSessionRequest request) 
     {
         Session _session = new Session
             {
@@ -28,16 +28,16 @@ public class SessionsRepository
         await _context.AddAsync(_session);
         await _context.SaveChangesAsync();
 
-        return new PostSessionResponse { ID = _session.SessionID};
+        return new OkObjectResult(new PostSessionResponse { ID = _session.SessionID});
     }
 
-    public async Task<PatchSessionResponse> PatchAsync(PatchSessionRequest request)
+    public async Task<ActionResult> PatchAsync(PatchSessionRequest request)
     {
         var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
 
         if (session is null)
         {
-            throw new ArgumentException("No session found with ID " + request.ID);
+            return new BadRequestResult();
         }
         if (request.Name is not null)
         {
@@ -54,44 +54,46 @@ public class SessionsRepository
         
         await _context.SaveChangesAsync();
 
-        return new PatchSessionResponse { ID = session.SessionID };
+        return new OkObjectResult(new PatchSessionResponse { ID = session.SessionID });
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<ActionResult> DeleteAsync(int id)
     {
         var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == id);
 
         if (session is null)
         {
-            throw new InvalidOperationException();
+            return new BadRequestResult();
         }
 
         _context.Sessions.Remove(session);
         await _context.SaveChangesAsync();
+        return new NoContentResult();
     }
 
 
-    public async Task<GetSingleSessionResponse> GetSessionById(GetSingleSessionRequest request)
+    public async Task<ActionResult> GetSessionById(GetSingleSessionRequest request)
     {
         var _session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
 
         if (_session is null)
         {
-            throw new ArgumentException("No session found with ID " + request.ID);
+            return new EmptyResult();
         }
-        return new GetSingleSessionResponse {
-            ID = _session.SessionID,
-            Name = _session.Name,
-            StartDate = _session.StartDate
-        }; 
+        return new OkObjectResult(new GetSingleSessionResponse 
+            {
+                ID = _session.SessionID,
+                Name = _session.Name,
+                StartDate = _session.StartDate
+            }); 
     }
 
-    public async Task<GetSessionsResponse> GetSessionsAsync(GetSessionsRequest request)
+    public async Task<ActionResult> GetSessionsAsync(GetSessionsRequest request)
     {
         var query = _context.Sessions.AsQueryable();
 
         //Check the received request and build the query
-        if (request.EventID > 0)
+        if (request.EventID is not null && request.EventID > 0)
         {
             query = query.Where(e => e.EventID == request.EventID);
         }
@@ -103,6 +105,7 @@ public class SessionsRepository
 
         if (request.VenueID > 0)
         {
+            //TODO: Find out how to get this working. 
             // query = query.QuerySessionsByVenueId(request.VenueID);
             query = query.Where(s => s.VenueID == request.VenueID);
         }
@@ -129,7 +132,7 @@ public class SessionsRepository
             query = query.Where(s => s.Sponsors.Any(i => i.SponsorID == request.SponsorID));
         }
 
-        return await ProjectToGetSessionsResponseDTO(query);
+        return new OkObjectResult(await ProjectToGetSessionsResponseDTO(query));
     }
 
     private async Task<GetSessionsResponse> ProjectToGetSessionsResponseDTO(IQueryable<Session> queryable)

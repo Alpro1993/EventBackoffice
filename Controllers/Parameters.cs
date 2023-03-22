@@ -8,23 +8,26 @@ namespace EventBackofficeBackend.Controllers
 {
     public class Parameters
     {
-        public int ID {get; set;} = default!;
-        public Dictionary<string, int> IDs {get; set;} = default!; 
-        public string StartDate {get; set;} = default!;
-        public string EndDate {get; set;} = default!;
+        public int? ID {get; set;} = default!;
+        public Dictionary<string, int>? IDs {get; set;} = default!; 
+        public string? StartDate {get; set;} = default!;
+        public string? EndDate {get; set;} = default!;
 
         public void ValidateParameters()
         {
-            if (this.ID < 0) 
+            if (this.ID is not null && this.ID <= 0) 
             {
                 throw new ArgumentOutOfRangeException("Id", "Id must be greater than zero");
             }
 
-            foreach (string name in IDs.Keys)
+            if (IDs is not null)
             {
-                if (IDs[name] < 0)
+                foreach (string name in IDs.Keys)
                 {
-                    throw new ArgumentOutOfRangeException(name, name + " ID must be greater than zero");
+                    if (IDs[name] < 0)
+                    {
+                        throw new ArgumentOutOfRangeException(name, name + " ID must be greater than zero");
+                    }
                 }
             }
 

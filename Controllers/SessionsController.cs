@@ -94,7 +94,7 @@ namespace EventBackofficeBackend.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<PatchSessionResponse> PatchSession
+        public async Task<ActionResult> PatchSession
             (
                 int ID,
                 string? Name,
@@ -123,8 +123,9 @@ namespace EventBackofficeBackend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSession(int id)
+        public async Task<ActionResult> DeleteSession(int id)
         {
+            
             await repository.DeleteAsync(id);
 
             return NoContent();

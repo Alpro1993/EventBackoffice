@@ -324,3 +324,5 @@ EBO.db-wal
 EBO.db-wal
 .gitignore
 EBO.db
+EBO.db
+bin/Debug/net7.0/nunit.framework.dll
