@@ -17,16 +17,11 @@ public class EventsRepository
 {
     public required EventBackofficeBackendContext _context;
 
-    // public EventsRepository(EventBackofficeBackendContext context) 
-    // {
-    //     _context = context;
-    // }
-
-    public async Task<ActionResult> CreateAsync(PostEventRequest request) 
+    public async Task<Event> CreateAsync(PostEventRequest request) 
     {
         if (_context.Events.Any(e => e.Name.Equals(request.Name))) 
         {
-            return new BadRequestObjectResult("An event with that name already exists");
+            throw new InvalidOperationException("An event with that name already exists");
         }
 
         var @event = new Event {
@@ -38,63 +33,61 @@ public class EventsRepository
         await _context.AddAsync(@event);
         await _context.SaveChangesAsync();
 
-        return new CreatedAtActionResult("Create", "EventsController", @event.EventID, @event.EventID);
+        return @event;
     }
 
-    public async Task<ActionResult> PatchAsync(PatchEventRequest request)
+    public async Task<Event> PatchAsync(PatchEventRequest request)
     {
 
-        var _event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == request.ID);
+        var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == request.ID);
         
-        if (_event is null)
+        if (@event is null)
         {
-            return new BadRequestObjectResult("EventID was not found");
+            throw new KeyNotFoundException("EventID was not found");
         }
 
-        // Check what field
         if (request.Name is not null)
         {
-            _event.Name = request.Name;
+            @event.Name = request.Name;
         }
 
         if (request.StartDate is not null)
         {
-
-            _event.StartDate = DateTime.Parse(request.StartDate);
+            @event.StartDate = DateTime.Parse(request.StartDate);
         }
 
         if (request.EndDate is not null)
         {
-            _event.EndDate = DateTime.Parse(request.EndDate);
+            @event.EndDate = DateTime.Parse(request.EndDate);
         }
         
         await _context.SaveChangesAsync();
         
-        return new OkObjectResult(new PatchEventResponse { ID = _event.EventID});
+        return @event;
     }
 
-    public async Task<ActionResult> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
 
         if (@event is null)
         {
-            return new BadRequestObjectResult("Event was not found");
+            throw new KeyNotFoundException("Event was not found");
         }
 
         _context.Events.Remove(@event);
         await _context.SaveChangesAsync();
-        return new NoContentResult();
+        return true;
     }
 
     //GET METHODS
-    public async Task<ActionResult> GetEventsAsync(GetEventsRequest request)
+    public async Task<List<Event>> GetEventsAsync(GetMultipleEventsRequest request)
     {
         var query = _context.Events.AsQueryable();
 
-        if (request.VenueID is not null && request.VenueID <= 0)
+        if (request.VenueID is int venueID && venueID <= 0)
         {
-            return new BadRequestObjectResult("Bad VenueID");
+            throw new ArgumentException("Bad VenueID");
         }
 
         //Check the received request and build the query
@@ -111,39 +104,18 @@ public class EventsRepository
                                                     && d.StartDate.Day == date.Day);
         }
 
-        return new OkObjectResult(await ProjectToGetEventsResponseDTO(query));
+        return await query.ToListAsync();
     }
 
-    public async Task<ActionResult> GetEventByIdAsync(int id)
+    public async Task<Event> GetEventByIdAsync(int id)
     {
         var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
 
         if (@event is not null)
         {
-            return new OkObjectResult(new GetSingleEventResponse {
-                EventID = @event.EventID,
-                Name = @event.Name,
-                StartDate = @event.StartDate,
-                EndDate = @event.EndDate
-            });
-        } else 
-        {
-            return new BadRequestObjectResult("EventID was not found");
-        }
+            return @event;
+        } 
 
-    }
-
-
-    private async Task<GetEventsResponse> ProjectToGetEventsResponseDTO(IQueryable<Event> queryable)
-    {
-        var _events = await queryable.Select(e => new GetEventsResponse.Event
-            {
-                EventID = e.EventID,
-                Name = e.Name,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate
-            }).ToListAsync();
-
-        return new GetEventsResponse { Events = _events};
+        throw new KeyNotFoundException("An Event with the given EventID was not found");
     }
 }

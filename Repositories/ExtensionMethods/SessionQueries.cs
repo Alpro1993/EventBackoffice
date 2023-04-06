@@ -9,55 +9,41 @@ namespace EventBackofficeBackend.Repositories.ExtensionMethods
 
     public static class SessionQueries
     {
-        public static IQueryable<Session> QuerySessionsByEvent(IQueryable<Session> _query, int eventId)
+        public static IQueryable<Session> QuerySessionsByEvent(this IQueryable<Session> _query, int eventId)
         {
-            var query = _query.Where(e => e.EventID == eventId);
-            
-            return query;
+            return _query.Where(e => e.EventID == eventId);
         }
 
-        public static IQueryable<Session> QueryParentlessSessions(IQueryable<Session> _query)
+        public static IQueryable<Session> QueryParentlessSessions(this IQueryable<Session> _query)
         {
-            var query = _query.Where(s => s.parentSession == null);
-
-            return query;        
+            return _query.Where(s => s.parentSession == null);
         }
 
-        public static IQueryable<Session> QueryChildSessionsBySessionId(IQueryable<Session> _query, int sessionId)
+        public static IQueryable<Session> QueryChildSessionsBySessionID(this IQueryable<Session> _query, int sessionId)
         {
-            var query = _query.Where(s => s.parentSessionID == sessionId);
-
-            return query;
+            return _query.Where(s => s.parentSessionID == sessionId);
         }
 
-        public static IQueryable<Session> QuerySessionsBySponsorId(IQueryable<Session> _query, int sponsorId)
+        public static IQueryable<Session> QuerySessionsBySponsorID(this IQueryable<Session> _query, int sponsorId)
         {
-            var query = _query.Where(s => s.Sponsors.Any(i => i.SponsorID == sponsorId));
-
-            return query;
+            return _query.Where(s => s.Sponsors.Any(i => i.SponsorID == sponsorId));
         }
 
-        public static IQueryable<Session> QuerySessionsByVenueId(IQueryable<Session> _query, int venueId) 
+        public static IQueryable<Session> QuerySessionsByVenueID(this IQueryable<Session> _query, int venueId) 
         {
-            var query = _query.Where(s => s.VenueID == venueId);
-
-            return query;
+            return _query.Where(s => s.VenueID == venueId);
         }
 
-        public static IQueryable<Session> QuerySessionsBySpeakerId(IQueryable<Session> _query, int speakerId)
+        public static IQueryable<Session> QuerySessionsBySpeakerID(this IQueryable<Session> _query, int speakerId)
         {
-            var query = _query.Where(s => s.Speakers.Any(x => x.PersonID == speakerId));
-
-            return query;
+            return _query.Where(s => s.Speakers.Any(x => x.PersonID == speakerId));
         }
 
-        public static IQueryable<Session> QuerySessionsByDate(IQueryable<Session> _query, DateTime date)
+        public static IQueryable<Session> QuerySessionsByDate(this IQueryable<Session> _query, DateTime date)
         {
-            var query = _query.Where(s => s.StartDate.Year == date.Year
+            return _query.Where(s => s.StartDate.Year == date.Year
                                 && s.StartDate.Month == date.Month
                                 && s.StartDate.Day == date.Day);
-
-            return query;
         }
     }
 }

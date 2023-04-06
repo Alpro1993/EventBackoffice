@@ -93,43 +93,40 @@ public class SessionsRepository
         var query = _context.Sessions.AsQueryable();
 
         //Check the received request and build the query
-        if (request.EventID is not null && request.EventID > 0)
+        if (request.EventID is int eventID && eventID > 0)
         {
-            query = query.Where(e => e.EventID == request.EventID);
+            query = query.Where(e => e.EventID == eventID);
         }
 
-        if (request.SpeakerID > 0)
+        if (request.SpeakerID is int speakerID && speakerID > 0)
         {
-            query = query.Where(s => s.Speakers.Any(x => x.PersonID == request.SpeakerID));
+            query = query.QuerySessionsBySpeakerID(speakerID);
         }
 
-        if (request.VenueID > 0)
+        if (request.VenueID is int venueID && venueID > 0)
         {
-            //TODO: Find out how to get this working. 
-            // query = query.QuerySessionsByVenueId(request.VenueID);
-            query = query.Where(s => s.VenueID == request.VenueID);
+            query = query.QuerySessionsByVenueID(venueID);
         }
+
         if (request.StartDate is not null)
         {
             var date = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT"));
-            query = query.Where(d => d.StartDate.Year == date.Year 
-                                                    && d.StartDate.Month == date.Month
-                                                    && d.StartDate.Day == date.Day);
+            query = query.QuerySessionsByDate(date);
         }
 
-        if (request.ParentID > 0)
+        if (request.ParentID is int parentID && parentID> 0)
         {
-            query = query.Where(s => s.parentSessionID == request.ParentID);
+            query = query.QueryChildSessionsBySessionID(parentID);
         }
 
         if (request.onlyParentlessSessions is true)
         {
-            query = query.Where(s => s.parentSessionID > 0);
+            query = query.QueryParentlessSessions();
         }
 
-        if (request.SponsorID > 0)
+        if (request.SponsorID is int sponsorID && sponsorID > 0)
         {
-            query = query.Where(s => s.Sponsors.Any(i => i.SponsorID == request.SponsorID));
+            query = query.QuerySessionsBySponsorID(sponsorID);
         }
 
         return new OkObjectResult(await ProjectToGetSessionsResponseDTO(query));

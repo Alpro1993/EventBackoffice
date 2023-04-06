@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventBackofficeBackend.Models.DTOs.Session
+namespace EventBackofficeBackend.Models.DTOs.Speaker
 {
-    public class CreateSessionResponse
+    public class GetSingleSpeakerRequest
     {
         
     }

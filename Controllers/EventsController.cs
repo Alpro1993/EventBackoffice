@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using EventBackofficeBackend.Models.DTOs.Event;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Repositories;
+using EventBackofficeBackend.Models;
+using AutoMapper;
+using EventBackofficeBackend.Mappings.Events;
 
 namespace EventBackofficeBackend.Controllers
 {
@@ -11,20 +14,19 @@ namespace EventBackofficeBackend.Controllers
     {
         private readonly EventBackofficeBackendContext _context;
         EventsRepository repository;
+        private readonly IMapper _mapper;
 
-        public EventsController(EventBackofficeBackendContext context)
+        public EventsController(EventBackofficeBackendContext context, IMapper mapper)
         {
             _context = context;
             repository = new EventsRepository {_context = context};
+
+            _mapper = mapper;
         }
 
         // GET: api/Events
         [HttpGet]
-        public async Task<ActionResult> GetEvents
-            (
-                int? venueId, 
-                string? startDate
-            )
+        public async Task<ActionResult> GetEvents(int? venueId, string? startDate)
         {
             //Create the request object and validate the parameters
             var parameters = new Parameters {
@@ -32,17 +34,50 @@ namespace EventBackofficeBackend.Controllers
                 StartDate = startDate
             };
             parameters.ValidateParameters();
-            var request = new GetEventsRequest {VenueID = venueId!, Date = startDate!};
             
-            //Pass the request object to the repository and retrieve the response object.
-            return await repository.GetEventsAsync(request);        
+            var request = new GetMultipleEventsRequest {VenueID = venueId!, Date = startDate!};
+            
+            try 
+            {
+                var events = await repository.GetEventsAsync(request);
+                var response = new GetMultipleEventsResponse{
+                    Events = _mapper.Map<List<GetSingleEventResponse>>(events)
+                };
+
+                return Ok(response);
+            } 
+            catch (KeyNotFoundException) 
+            {
+                return NoContent();
+            } 
+            catch (FormatException) 
+            {
+                return BadRequest("Wrong date format - use dd/MM/yyyy");
+            }
+            catch 
+            {
+                return StatusCode(500);
+            }   
         }
 
         // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult> GetEventById(int id)
         {
-            return await repository.GetEventByIdAsync(id);
+            try
+            {
+                var @event = await repository.GetEventByIdAsync(id); 
+                return Ok(_mapper.Map<GetSingleEventResponse>(@event));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
         }
 
         // POST: api/Events
@@ -58,17 +93,40 @@ namespace EventBackofficeBackend.Controllers
                 StartDate = StartDate,
                 EndDate = EndDate
             };
+            
+            try 
+            {
+                var @event = _mapper.Map<PostEventResponse>(await repository.CreateAsync(request));
+                return new CreatedAtActionResult("PostEvent", "EventsController", @event.EventID, @event);
+            }
+            catch (InvalidOperationException e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
 
-            return await repository.CreateAsync(request);
         }
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteEvent(int id)
         {
-            await repository.DeleteAsync(id);
-
-            return NoContent();
+            try
+            {
+                await repository.DeleteAsync(id);
+                return new NoContentResult();
+            }
+            catch (KeyNotFoundException e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+            catch 
+            {
+                return StatusCode(500);
+            }
         }
 
         // PATCH: api/Events/5
@@ -90,14 +148,21 @@ namespace EventBackofficeBackend.Controllers
             parameters.ValidateParameters();
 
             var request = new PatchEventRequest
-                {
-                    
+                {    
                     Name = name!,
                     StartDate = startDate!,
                     EndDate = endDate!
                 };
 
-            return await repository.PatchAsync(request);
+             try 
+             {
+             var @event = await repository.PatchAsync(request);
+                return new OkObjectResult(_mapper.Map<GetSingleEventResponse>(@event));
+             }
+             catch
+             {
+                return StatusCode(500);
+             }
         }
     }
 }

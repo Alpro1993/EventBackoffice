@@ -6,6 +6,9 @@ using EventBackofficeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AutoMapper;
+using EventBackofficeBackend.Mappings.Events;
+using EventBackofficeBackend.Models;
 
 namespace EventBackofficeBackend.Tests
 {
@@ -13,85 +16,197 @@ namespace EventBackofficeBackend.Tests
     public class EventsControllerTests
     {
         private EventsController _controller = default!;
-        private EventBackofficeBackendContext _context = default!;
+        private DbContextOptions<EventBackofficeBackendContext> _options = default!;
+        private IMapper _mapper = default!;
 
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
-                .UseSqlite("Data Source = ~/EBO.db")
-                .Options;
-            _context = new EventBackofficeBackendContext(options);
-            _controller = new EventsController(_context);
+            var mapperConfig = new MapperConfiguration(config => { config.AddProfile(new EventMappingProfile());});
+            IMapper mapper = mapperConfig.CreateMapper();
+            _mapper = mapper;
+
         }
 
         [Test]
-        public async Task GetEvents_ReturnsOkObjectResult_WithGetEventsResponse()
+        public async Task GetEvents_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            // Arrange
-            var venueId = 1;
-            var startDate = "2023-03-22";
-            var request = new GetEventsRequest { VenueID = venueId, Date = startDate };
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(GetEvents_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
+                .Options;
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+                
+                // Act
+                var result = await _controller.GetEvents(null, null) as OkObjectResult;
+                var response = result!.Value as GetMultipleEventsResponse;
 
-            // Act
-            var result = await _controller.GetEvents(venueId, startDate) as OkObjectResult;
-            var response = result!.Value as GetEventsResponse;
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(200, result.StatusCode);
+                Assert.IsNotNull(response);
+                Assert.AreEqual(3, response!.Events.Count);
+            }
+        }
 
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(200, result.StatusCode);
-            Assert.IsNotNull(response);
-            Assert.AreEqual(1, response!.Events.Count);
+        [Test]
+        public async Task GetEvents_ByDate_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
+        {
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(GetEvents_ByDate_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
+                .Options;
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+                // Arrange
+                var startDate = "05/06/2023";
+
+                // Act
+                var result = await _controller.GetEvents(null, startDate) as OkObjectResult;
+                var response = result!.Value as GetMultipleEventsResponse;
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(200, result.StatusCode);
+                Assert.IsNotNull(response);
+                Assert.AreEqual(1, response!.Events.Count);
+            }
+        }
+
+        [Test]
+        public async Task GetEvents_ByVenue_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
+        {
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(GetEvents_ByVenue_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
+                .Options;
+
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+
+                // Arrange
+                var venueId = 1;
+
+                // Act
+                var result = await _controller.GetEvents(venueId, null) as OkObjectResult;
+                var response = result!.Value as GetMultipleEventsResponse;
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(200, result.StatusCode);
+                Assert.IsNotNull(response);
+                Assert.AreEqual(3, response!.Events.Count);
+            }
         }
 
         [Test]
         public async Task GetEventById_ReturnsOkObjectResult_WithGetSingleEventResponse()
         {
-            // Arrange
-            var id = 1;
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(GetEventById_ReturnsOkObjectResult_WithGetSingleEventResponse))
+                .Options;
+            
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+                
+                // Arrange
+                var id = 1;
 
-            // Act
-            var result = await _controller.GetEventById(id) as OkObjectResult;
-            var response = result!.Value as GetSingleEventResponse;
+                // Act
+                var result = await _controller.GetEventById(id) as OkObjectResult;
+                var response = result!.Value as GetSingleEventResponse;
 
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(200, result.StatusCode);
-            Assert.IsNotNull(response);
-            Assert.AreEqual(id, response!.EventID);
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(200, result.StatusCode);
+                Assert.IsNotNull(response);
+                Assert.AreEqual(id, response!.EventID);
+            }
         }
 
+        [Test]
+        public async Task GetEventById_ReturnsNoContentResult()
+        {
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(GetEventById_ReturnsNoContentResult))
+                .Options;
+
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+                
+                // Arrange
+                var id = 55;
+
+                // Act
+                var result = await _controller.GetEventById(id) as NoContentResult;
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(204, result!.StatusCode);
+            }
+        }
+
+        [Test]
+
+        public async Task DeleteEvent_ReturnsNoContentResult()
+        {
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(DeleteEvent_ReturnsNoContentResult))
+                .Options;
+
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+
+                // Arrange
+                var id = 3;
+
+                // Act
+                var result = await _controller.DeleteEvent(id) as NoContentResult;
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(204, result!.StatusCode);
+            }
+        }
+        
         [Test]
         public async Task PostEvent_ReturnsCreatedAtActionResult_WithPostEventResponse()
         {
-            // Arrange
-            var name = "Test Event";
-            var startDate = "2023-03-22";
-            var endDate = "2023-03-23";
-            var request = new PostEventRequest { Name = name, StartDate = startDate, EndDate = endDate };
+            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+                .UseInMemoryDatabase(databaseName: nameof(PostEvent_ReturnsCreatedAtActionResult_WithPostEventResponse))
+                .Options;
 
-            // Act
-            var result = await _controller.PostEvent(name, startDate, endDate) as CreatedAtActionResult;
-            var response = result!.Value as PostEventResponse;
+            using (var _context = new EventBackofficeBackendContext(_options))
+            {
+                _controller = new EventsController(_context, _mapper);
+                DbInitializer.Initialize(_context);
+            
+                // Arrange
+                var name = "Test Event";
+                var startDate = "22/03/2023";
+                var endDate = "22/03/2023";
+                var request = new PostEventRequest { Name = name, StartDate = startDate, EndDate = endDate };
 
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(201, result.StatusCode);
-            Assert.IsNotNull(response);
-        }
+                // Act
+                var result = await _controller.PostEvent(name, startDate, endDate) as CreatedAtActionResult;
+                var response = result!.Value as PostEventResponse;
 
-        [Test]
-        public async Task DeleteEvent_ReturnsNoContentResult()
-        {
-            // Arrange
-            var id = 1;
-
-            // Act
-            var result = await _controller.DeleteEvent(id) as NoContentResult;
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(204, result!.StatusCode);
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(201, result.StatusCode);
+                Assert.IsNotNull(response);
+                Assert.AreEqual(4, response!.EventID);
+            }
         }
     }
 }

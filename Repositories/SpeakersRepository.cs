@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Sqlite;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Models;
+using Microsoft.AspNetCore.Mvc;
+using EventBackofficeBackend.Models.DTOs.Speaker;
 
 namespace EventBackofficeBackend.Repositories;
 public class SpeakersRepository
@@ -18,43 +20,45 @@ public class SpeakersRepository
         _context = context;
     }
 
-    public async Task CreateAsync(Speaker speaker) 
-    {
-        if (speaker.PersonID != 0) 
-        {
-            throw new InvalidOperationException();
-        }
+    // public async Task<ActionResult> CreateAsync(PostSpeakerRequest request) 
+    // {
+    //     if (request.EventID is int eventID && eventID != 0) 
+    //     {
+    //         var @event = await _context.Events.FirstOrDefaultAsync(e => e.EventID == eventID);
+    //         if (@event is not null)
+    //         {
+    //             var speaker = new Speaker {Event = @event, Name = request.Name};
+    //             await _context.AddAsync(speaker);
+    //             await _context.SaveChangesAsync();
 
-        await _context.AddAsync(speaker);
-        await _context.SaveChangesAsync();
-    }
+    //             return new ObjectCr
+    //         }
+    //         else return new BadRequestObjectResult("An Event with the given EventID was not found");
+    //     }
+    //     else return new BadRequestObjectResult("Given EventID is not valid.");
+    // }
 
-    public async Task<List<Speaker>> GetSpeakersAsync(bool asNoTracking = false)
-    {
-        var queryable = _context.Speakers.AsQueryable();
-        
-        if (asNoTracking)
-        {
-            return await queryable.AsNoTracking().ToListAsync();
-        }
-        
-        return await queryable.ToListAsync();
-    }
+    // public async Task<ActionResult> GetSpeakersAsync()
+    // {
+    //     var queryable = _context.Speakers.AsQueryable();
 
-    public async Task<Speaker> GetSpeakerByIdAsync(int id)
-    {
-        var speakers = _context.Speakers;
+    //     return await queryable.ToListAsync();
+    // }
 
-        if (speakers is not null)
-        {
-            var speaker = await speakers.FirstOrDefaultAsync(s => s.PersonID == id);
-            return speaker ?? throw new ArgumentException("No speaker found with ID " + id); 
-        }
-        else
-        {
-            throw new Exception("DBSet Speakers is null");
-        } 
-    }
+    // public async Task<ActionResult> GetSpeakerByIdAsync(int id)
+    // {
+    //     var speakers = _context.Speakers;
+
+    //     if (speakers is not null)
+    //     {
+    //         var speaker = await speakers.FirstOrDefaultAsync(s => s.PersonID == id);
+    //         return speaker ?? throw new ArgumentException("No speaker found with ID " + id); 
+    //     }
+    //     else
+    //     {
+    //         throw new Exception("DBSet Speakers is null");
+    //     } 
+    // }
 
     public async Task DeleteAsync(int id)
     {
