@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using EventBackofficeBackend.Models.DTOs.Session;
 using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Repositories;
+using AutoMapper;
 
 namespace EventBackofficeBackend.Controllers
 {
@@ -14,22 +15,36 @@ namespace EventBackofficeBackend.Controllers
     public class SessionsController : ControllerBase
     {
         private readonly EventBackofficeBackendContext _context;
+        private readonly IMapper _mapper;
         SessionsRepository repository;
 
-        public SessionsController(EventBackofficeBackendContext context)
+        public SessionsController(EventBackofficeBackendContext context, IMapper mapper)
         {
             _context = context;
             repository = new SessionsRepository {_context = context};
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetSingleSessionResponse>> GetSingleSession(int id)
+        public async Task<ActionResult<GetSingleSessionResponse>> GetSessionById(int id)
         {
-            return await repository.GetSessionById(new GetSingleSessionRequest {ID = id});
+            try
+            {
+                var session =  await repository.GetSessionById(new GetSingleSessionRequest {ID = id});
+                return Ok(_mapper.Map<GetSingleSessionResponse>(session));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetSessionsResponse>> GetSessions
+        public async Task<ActionResult<GetMultipleSessionsResponse>> GetSessions
             (
                 string? StartDate = null,
                 int EventId = 0,
@@ -60,7 +75,7 @@ namespace EventBackofficeBackend.Controllers
             parameters.ValidateParameters();
 
             //Create a request object to pass to the repository
-            var request = new GetSessionsRequest
+            var request = new GetMultipleSessionsRequest
                             {
                                 EventID = EventId,
                                 SpeakerID = SpeakerId,
@@ -72,7 +87,24 @@ namespace EventBackofficeBackend.Controllers
                             };
             
             //Pass the request object and retrieve the response object.
-            return await repository.GetSessionsAsync(request);
+            try
+            {
+                var sessions = await repository.GetSessionsAsync(request);
+                var response = new GetMultipleSessionsResponse
+                    {
+                        Sessions = _mapper.Map<List<GetSingleSessionResponse>>(sessions)
+                    };
+
+                return Ok(response);    
+            }
+            catch (KeyNotFoundException)
+            {
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
@@ -90,7 +122,15 @@ namespace EventBackofficeBackend.Controllers
                     EndDate = EndDate
                 };
 
-            return await repository.CreateAsync(request);
+            try
+            {
+                var session = await repository.CreateAsync(request);
+                return Ok(_mapper.Map<PostSessionResponse>(session));
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPatch("{id}")]
@@ -118,17 +158,38 @@ namespace EventBackofficeBackend.Controllers
                     EndDate = EndDate!
                 };
 
-            return await repository.PatchAsync(request);
-
+            try
+            {
+                var session = await repository.PatchAsync(request);
+                return Ok(_mapper.Map<GetSingleSessionRequest>(session));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteSession(int id)
         {
             
-            await repository.DeleteAsync(id);
-
-            return NoContent();
+            try
+            {
+                await repository.DeleteAsync(id); 
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

@@ -16,28 +16,28 @@ public class SessionsRepository
 
     public SessionsRepository() {}
 
-    public async Task<ActionResult> CreateAsync(PostSessionRequest request) 
+    public async Task<Session> CreateAsync(PostSessionRequest request) 
     {
-        Session _session = new Session
+        Session session = new Session
             {
                 Name = request.Name,
                 StartDate = DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", new CultureInfo("pt-PT")),
                 EndDate = DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", new CultureInfo("pt-PT"))
             };
 
-        await _context.AddAsync(_session);
+        await _context.AddAsync(session);
         await _context.SaveChangesAsync();
 
-        return new OkObjectResult(new PostSessionResponse { ID = _session.SessionID});
+        return session;
     }
 
-    public async Task<ActionResult> PatchAsync(PatchSessionRequest request)
+    public async Task<Session> PatchAsync(PatchSessionRequest request)
     {
         var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
 
         if (session is null)
         {
-            return new BadRequestResult();
+            throw new KeyNotFoundException("A session with the given ID was not found");
         }
         if (request.Name is not null)
         {
@@ -54,41 +54,36 @@ public class SessionsRepository
         
         await _context.SaveChangesAsync();
 
-        return new OkObjectResult(new PatchSessionResponse { ID = session.SessionID });
+        return session;
     }
 
-    public async Task<ActionResult> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == id);
 
         if (session is null)
         {
-            return new BadRequestResult();
+            throw new KeyNotFoundException("A session with the given ID was not found");
         }
 
         _context.Sessions.Remove(session);
         await _context.SaveChangesAsync();
-        return new NoContentResult();
+        return true;
     }
 
 
-    public async Task<ActionResult> GetSessionById(GetSingleSessionRequest request)
+    public async Task<Session> GetSessionById(GetSingleSessionRequest request)
     {
-        var _session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
+        var session = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionID == request.ID);
 
-        if (_session is null)
+        if (session is null)
         {
-            return new EmptyResult();
+            throw new KeyNotFoundException("A session with the given ID was not found");
         }
-        return new OkObjectResult(new GetSingleSessionResponse 
-            {
-                ID = _session.SessionID,
-                Name = _session.Name,
-                StartDate = _session.StartDate
-            }); 
+        return session;
     }
 
-    public async Task<ActionResult> GetSessionsAsync(GetSessionsRequest request)
+    public async Task<List<Session>> GetSessionsAsync(GetMultipleSessionsRequest request)
     {
         var query = _context.Sessions.AsQueryable();
 
@@ -129,18 +124,6 @@ public class SessionsRepository
             query = query.QuerySessionsBySponsorID(sponsorID);
         }
 
-        return new OkObjectResult(await ProjectToGetSessionsResponseDTO(query));
-    }
-
-    private async Task<GetSessionsResponse> ProjectToGetSessionsResponseDTO(IQueryable<Session> queryable)
-    {
-            var _sessions = await queryable.Select(s => new GetSessionsResponse.Session
-            {
-                SessionID = s.SessionID,
-                Name = s.Name,
-                StartDate = s.StartDate,
-            }).ToListAsync();
-
-        return new GetSessionsResponse { Sessions = _sessions};
+        return await query.ToListAsync();
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EventBackofficeBackend.Models.DTOs.Session
 {
-    public class GetSessionsRequest
+    public class GetMultipleSessionsRequest
     {
         public int? EventID {get; set;}
         public int? VenueID {get; set;}
