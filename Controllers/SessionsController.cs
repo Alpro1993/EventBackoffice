@@ -26,7 +26,7 @@ namespace EventBackofficeBackend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetSingleSessionResponse>> GetSessionById(int id)
+        public async Task<ActionResult> GetSessionById(int id)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace EventBackofficeBackend.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return NoContent();
+                return NotFound();
             }
             catch
             {
@@ -44,7 +44,7 @@ namespace EventBackofficeBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetMultipleSessionsResponse>> GetSessions
+        public async Task<ActionResult> GetSessions
             (
                 string? StartDate = null,
                 int EventId = 0,
@@ -52,7 +52,7 @@ namespace EventBackofficeBackend.Controllers
                 int VenueId = 0,
                 int ParentId = 0,
                 int SponsorId = 0,
-                bool Parentless = true
+                bool Parentless = false
             )
         {
             //Creates a dictionary of IDs for parameter checking.
@@ -99,7 +99,7 @@ namespace EventBackofficeBackend.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return NoContent();
+                return NotFound();
             }
             catch
             {
@@ -108,7 +108,7 @@ namespace EventBackofficeBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PostSessionResponse>> PostSession
+        public async Task<ActionResult> PostSession
             (
                 string Name,
                 string StartDate,
@@ -165,7 +165,7 @@ namespace EventBackofficeBackend.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return NoContent();
+                return NotFound();
             }
             catch
             {
@@ -184,7 +184,7 @@ namespace EventBackofficeBackend.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return NoContent();
+                return NotFound();
             }
             catch
             {

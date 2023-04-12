@@ -131,8 +131,8 @@ public static class DbInitializer
             new Session
             {
                 Name = "Lunch Break",
-                StartDate = DateTime.Parse("2023-05-01 12:00:00"),
-                EndDate = DateTime.Parse("2023-05-01 13:00:00"),
+                StartDate = DateTime.Parse("2023-05-02 12:00:00"),
+                EndDate = DateTime.Parse("2023-05-02 13:00:00"),
                 Room = rooms[2],
                 Venue = venues[1],
                 Event = events[1]
@@ -161,7 +161,7 @@ public static class DbInitializer
                 Room = rooms[0],
                 Venue = venues[0],
                 Event = events[0],
-                parentSession = sessions[0]
+                parentSession = sessions[1]
             },
             new Session
             {
@@ -171,7 +171,7 @@ public static class DbInitializer
                 Room = rooms[1],
                 Venue = venues[1],
                 Event = events[0],
-                parentSession = sessions[2]
+                parentSession = sessions[0]
             },
             new Session
             {
@@ -181,7 +181,7 @@ public static class DbInitializer
                 Room = rooms[2],
                 Venue = venues[1],
                 Event = events[0],
-                parentSession = sessions[1]
+                parentSession = sessions[0]
             }
 
         };

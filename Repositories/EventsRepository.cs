@@ -81,6 +81,18 @@ public class EventsRepository
     }
 
     //GET METHODS
+    public async Task<Event> GetEventByIdAsync(int id)
+    {
+        var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
+
+        if (@event is not null)
+        {
+            return @event;
+        } 
+
+        throw new KeyNotFoundException("An Event with the given EventID was not found");
+    }
+    
     public async Task<List<Event>> GetEventsAsync(GetMultipleEventsRequest request)
     {
         var query = _context.Events.AsQueryable();
@@ -105,17 +117,5 @@ public class EventsRepository
         }
 
         return await query.ToListAsync();
-    }
-
-    public async Task<Event> GetEventByIdAsync(int id)
-    {
-        var @event = await _context.Events.FirstOrDefaultAsync(s => s.EventID == id);
-
-        if (@event is not null)
-        {
-            return @event;
-        } 
-
-        throw new KeyNotFoundException("An Event with the given EventID was not found");
     }
 }
