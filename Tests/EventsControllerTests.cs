@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Mappings.Events;
+using EventBackofficeBackend.Mappings;
 using EventBackofficeBackend.Models;
 
 namespace EventBackofficeBackend.Tests

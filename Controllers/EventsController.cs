@@ -4,7 +4,7 @@ using EventBackofficeBackend.Data;
 using EventBackofficeBackend.Repositories;
 using EventBackofficeBackend.Models;
 using AutoMapper;
-using EventBackofficeBackend.Mappings.Events;
+using EventBackofficeBackend.Mappings;
 
 namespace EventBackofficeBackend.Controllers
 {

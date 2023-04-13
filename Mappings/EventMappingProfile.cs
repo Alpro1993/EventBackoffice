@@ -6,7 +6,7 @@ using AutoMapper;
 using EventBackofficeBackend.Models.DTOs.Event;
 using EventBackofficeBackend.Models;
 
-namespace EventBackofficeBackend.Mappings.Events
+namespace EventBackofficeBackend.Mappings
 {
     public class EventMappingProfile : Profile
     {

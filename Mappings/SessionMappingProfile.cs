@@ -6,7 +6,7 @@ using AutoMapper;
 using EventBackofficeBackend.Models;
 using EventBackofficeBackend.Models.DTOs.Session;
 
-namespace EventBackofficeBackend.Mappings.Events
+namespace EventBackofficeBackend.Mappings
 {
     public class SessionMappingProfile : Profile
     {

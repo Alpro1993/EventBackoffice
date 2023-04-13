@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EventBackofficeBackend.Mappings;
 using EventBackofficeBackend.Models;
-using EventBackofficeBackend.Mappings.Events;
 
 namespace EventBackofficeBackend.Tests
 {
