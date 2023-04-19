@@ -1,14 +1,14 @@
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EventBackofficeBackend.Data;
+namespace EventBackoffice.Backend.Data;
 public static class DbInitializer
 {
-    public static void Initialize(EventBackofficeBackendContext context)
+    public static void Initialize(BackendContext context)
     {
 
         if (context.Events.Any()) {

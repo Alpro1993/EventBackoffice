@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Sqlite;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Models;
-using EventBackofficeBackend.Models.DTOs.Event;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Models;
+using EventBackoffice.Backend.Models.DTOs.Event;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EventBackofficeBackend.Repositories;
+namespace EventBackoffice.Backend.Repositories;
 
 public class EventsRepository
 {
-    public required EventBackofficeBackendContext _context;
+    public required BackendContext _context;
 
     public async Task<Event> CreateAsync(PostEventRequest request) 
     {

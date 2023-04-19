@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using EventBackofficeBackend.Models.DTOs.Session;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Repositories;
+using EventBackoffice.Backend.Models.DTOs.Session;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Repositories;
 using AutoMapper;
 
-namespace EventBackofficeBackend.Controllers
+namespace EventBackoffice.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class SessionsController : ControllerBase
     {
-        private readonly EventBackofficeBackendContext _context;
+        private readonly BackendContext _context;
         private readonly IMapper _mapper;
         SessionsRepository repository;
 
-        public SessionsController(EventBackofficeBackendContext context, IMapper mapper)
+        public SessionsController(BackendContext context, IMapper mapper)
         {
             _context = context;
             repository = new SessionsRepository {_context = context};

@@ -1,22 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
-using EventBackofficeBackend.Models.DTOs.Event;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Repositories;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models.DTOs.Event;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Repositories;
+using EventBackoffice.Backend.Models;
 using AutoMapper;
-using EventBackofficeBackend.Mappings;
+using EventBackoffice.Backend.Mappings;
 
-namespace EventBackofficeBackend.Controllers
+namespace EventBackoffice.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly EventBackofficeBackendContext _context;
+        private readonly BackendContext _context;
         EventsRepository repository;
         private readonly IMapper _mapper;
 
-        public EventsController(EventBackofficeBackendContext context, IMapper mapper)
+        public EventsController(BackendContext context, IMapper mapper)
         {
             _context = context;
             repository = new EventsRepository {_context = context};

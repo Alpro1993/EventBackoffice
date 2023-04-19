@@ -1,4 +1,4 @@
-# EventBackofficeBackend
+# EventBackoffice.Backend
 
 This project is the backend of the backoffice part of an app designed to support event attendees.
 

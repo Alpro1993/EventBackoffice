@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Repositories.ExtensionMethods
+namespace EventBackoffice.Backend.Repositories.ExtensionMethods
 {
     public static class SpeakerQueries
     {

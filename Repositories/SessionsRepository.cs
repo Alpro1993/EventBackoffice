@@ -1,18 +1,18 @@
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Models;
-using EventBackofficeBackend.Models.DTOs.Session;
-using EventBackofficeBackend.Repositories.ExtensionMethods;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Models;
+using EventBackoffice.Backend.Models.DTOs.Session;
+using EventBackoffice.Backend.Repositories.ExtensionMethods;
 
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EventBackofficeBackend.Repositories;
+namespace EventBackoffice.Backend.Repositories;
 
 public class SessionsRepository
 {
-    public required EventBackofficeBackendContext _context;
+    public required BackendContext _context;
 
     public SessionsRepository() {}
 

@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Mappings;
-using EventBackofficeBackend.Models.DTOs.Session;
-using EventBackofficeBackend.Repositories;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Mappings;
+using EventBackoffice.Backend.Models.DTOs.Session;
+using EventBackoffice.Backend.Repositories;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace EventBackofficeBackend.Tests
+namespace EventBackoffice.Backend.Tests
 {
     [TestFixture]
     public class SessionsRepositoryTests
     {
         private SessionsRepository _repository = default!;
-        private DbContextOptions<EventBackofficeBackendContext> _options = default!;
+        private DbContextOptions<BackendContext> _options = default!;
         private IMapper _mapper = default!;
 
         [OneTimeSetUp]
@@ -31,11 +31,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessionById_ReturnsSession()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessionById_ReturnsSession))
                 .Options;
 
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -55,11 +55,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessionById_ThrowsKeyNotFoundException()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessionById_ThrowsKeyNotFoundException))
                 .Options;
 
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -84,11 +84,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetAllSessions_ReturnsListOfSessions()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetAllSessions_ReturnsListOfSessions))
                 .Options;
 
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -108,11 +108,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_OnlyParentless_ReturnsListOfSessions()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_OnlyParentless_ReturnsListOfSessions))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -132,11 +132,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_ByParentID_ReturnsListOfSessions()
         {
-           _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+           _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_ByParentID_ReturnsListOfSessions))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -156,11 +156,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_ByStartDate_ReturnsListOfSessions()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_ByStartDate_ReturnsListOfSessions))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -180,11 +180,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task CreateSession_ReturnsSession()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(CreateSession_ReturnsSession))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -206,11 +206,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task PatchSession_ReturnsSession()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(PatchSession_ReturnsSession))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -232,11 +232,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task PatchSession_ThrowsKeyNotFoundException()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(PatchSession_ThrowsKeyNotFoundException))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -261,11 +261,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task DeleteSession_ReturnsTrue()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(DeleteSession_ReturnsTrue))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);
@@ -285,11 +285,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task DeleteSession_ThrowsKeyNotFoundException()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(DeleteSession_ThrowsKeyNotFoundException))
                 .Options;
             
-            using (var context = new EventBackofficeBackendContext(_options))
+            using (var context = new BackendContext(_options))
             {
                 _repository = new SessionsRepository {_context = context};
                 DbInitializer.Initialize(context);

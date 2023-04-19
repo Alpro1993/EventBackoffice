@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Models.DTOs.Event;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models.DTOs.Event;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Mappings
+namespace EventBackoffice.Backend.Mappings
 {
     public class EventMappingProfile : Profile
     {

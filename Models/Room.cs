@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EventBackofficeBackend.Models;
+namespace EventBackoffice.Backend.Models;
 public class Room {
     public int RoomID {get; set;}
     [Required]

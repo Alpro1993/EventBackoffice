@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EventBackofficeBackend.Models;
+namespace EventBackoffice.Backend.Models;
 public class Event {
     // Primary Key
     public int EventID {get; set;}

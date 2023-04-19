@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Models.DTOs.Speaker
+namespace EventBackoffice.Backend.Models.DTOs.Speaker
 {
     public class PostSpeakerRequest
     {

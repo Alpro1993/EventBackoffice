@@ -1,22 +1,22 @@
 using NUnit.Framework;
-using EventBackofficeBackend.Controllers;
-using EventBackofficeBackend.Models.DTOs.Session;
-using EventBackofficeBackend.Repositories;
-using EventBackofficeBackend.Data;
+using EventBackoffice.Backend.Controllers;
+using EventBackoffice.Backend.Models.DTOs.Session;
+using EventBackoffice.Backend.Repositories;
+using EventBackoffice.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Mappings;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Mappings;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Tests
+namespace EventBackoffice.Backend.Tests
 {
     [TestFixture]
     public class SessionsControllerTests
     {
         private SessionsController _controller = default!;
-        private DbContextOptions<EventBackofficeBackendContext> _options = default!;
+        private DbContextOptions<BackendContext> _options = default!;
         private IMapper _mapper = default!;
 
         [OneTimeSetUp]
@@ -31,10 +31,10 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_ReturnsOkObjectResult_WithGetMultipleSessionsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_ReturnsOkObjectResult_WithGetMultipleSessionsResponse))
                 .Options;
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -54,10 +54,10 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_ByDate_ReturnsOkObjectResult_WithGetMultipleSessionsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_ByDate_ReturnsOkObjectResult_WithGetMultipleSessionsResponse))
                 .Options;
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -79,11 +79,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_Parentless_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_Parentless_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -103,11 +103,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessions_ByParentId_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessions_ByParentId_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -128,11 +128,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessionById_ReturnsOkObjectResult_WithGetSingleEventResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessionById_ReturnsOkObjectResult_WithGetSingleEventResponse))
                 .Options;
             
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -155,11 +155,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetSessionById_ReturnsNotFoundResult()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetSessionById_ReturnsNotFoundResult))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -180,11 +180,11 @@ namespace EventBackofficeBackend.Tests
 
         public async Task DeleteSession_ReturnsNoContentResult()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(DeleteSession_ReturnsNoContentResult))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -204,11 +204,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task DeleteSession_ReturnsNotFoundResult()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(DeleteSession_ReturnsNotFoundResult))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -228,11 +228,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task PostSession_ReturnsOkResult_WithPostEventResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(PostSession_ReturnsOkResult_WithPostEventResponse))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new SessionsController(_context, _mapper);
                 DbInitializer.Initialize(_context);

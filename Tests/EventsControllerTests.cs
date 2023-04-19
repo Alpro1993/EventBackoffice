@@ -1,22 +1,22 @@
 using NUnit.Framework;
-using EventBackofficeBackend.Controllers;
-using EventBackofficeBackend.Models.DTOs.Event;
-using EventBackofficeBackend.Repositories;
-using EventBackofficeBackend.Data;
+using EventBackoffice.Backend.Controllers;
+using EventBackoffice.Backend.Models.DTOs.Event;
+using EventBackoffice.Backend.Repositories;
+using EventBackoffice.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Mappings;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Mappings;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Tests
+namespace EventBackoffice.Backend.Tests
 {
     [TestFixture]
     public class EventsControllerTests
     {
         private EventsController _controller = default!;
-        private DbContextOptions<EventBackofficeBackendContext> _options = default!;
+        private DbContextOptions<BackendContext> _options = default!;
         private IMapper _mapper = default!;
 
         [OneTimeSetUp]
@@ -31,10 +31,10 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetEvents_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetEvents_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
                 .Options;
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -54,10 +54,10 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetEvents_ByDate_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetEvents_ByDate_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
                 .Options;
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -79,11 +79,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetEvents_ByVenue_ReturnsOkObjectResult_WithGetMultipleEventsResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetEvents_ByVenue_ReturnsOkObjectResult_WithGetMultipleEventsResponse))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -106,11 +106,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetEventById_ReturnsOkObjectResult_WithGetSingleEventResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetEventById_ReturnsOkObjectResult_WithGetSingleEventResponse))
                 .Options;
             
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -133,11 +133,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task GetEventById_ReturnsNoContentResult()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(GetEventById_ReturnsNoContentResult))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -158,11 +158,11 @@ namespace EventBackofficeBackend.Tests
 
         public async Task DeleteEvent_ReturnsNoContentResult()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(DeleteEvent_ReturnsNoContentResult))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);
@@ -182,11 +182,11 @@ namespace EventBackofficeBackend.Tests
         [Test]
         public async Task PostEvent_ReturnsCreatedAtActionResult_WithPostEventResponse()
         {
-            _options = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            _options = new DbContextOptionsBuilder<BackendContext>()
                 .UseInMemoryDatabase(databaseName: nameof(PostEvent_ReturnsCreatedAtActionResult_WithPostEventResponse))
                 .Options;
 
-            using (var _context = new EventBackofficeBackendContext(_options))
+            using (var _context = new BackendContext(_options))
             {
                 _controller = new EventsController(_context, _mapper);
                 DbInitializer.Initialize(_context);

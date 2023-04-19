@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventBackofficeBackend.Models
+namespace EventBackoffice.Backend.Models
 {
     public class Representative : Person
     {

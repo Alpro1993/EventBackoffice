@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EventBackofficeBackend.Models;
-using EventBackofficeBackend.Models.DTOs.Session;
+using EventBackoffice.Backend.Models;
+using EventBackoffice.Backend.Models.DTOs.Session;
 
-namespace EventBackofficeBackend.Mappings
+namespace EventBackoffice.Backend.Mappings
 {
     public class SessionMappingProfile : Profile
     {

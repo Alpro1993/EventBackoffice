@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventBackofficeBackend.Controllers
+namespace EventBackoffice.Backend.Controllers
 {
     public class Parameters
     {

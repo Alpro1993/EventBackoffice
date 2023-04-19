@@ -1,24 +1,24 @@
 using NUnit.Framework;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Repositories;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Repositories;
 using Moq;
 using Microsoft.EntityFrameworkCore;
-using EventBackofficeBackend.Models.DTOs.Event;
+using EventBackoffice.Backend.Models.DTOs.Event;
 using Microsoft.AspNetCore.Mvc;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Tests
+namespace EventBackoffice.Backend.Tests
 {
     public class EventsRepositoryTests
     {
         private EventsRepository _repository = default!;
-        private Mock<EventBackofficeBackendContext> _contextMock = default!;
+        private Mock<BackendContext> _contextMock = default!;
 
         [SetUp]
         public void Setup()
         {
-            _contextMock = new Mock<EventBackofficeBackendContext>
-                            (new DbContextOptions<EventBackofficeBackendContext>());
+            _contextMock = new Mock<BackendContext>
+                            (new DbContextOptions<BackendContext>());
             _repository = new EventsRepository {_context = _contextMock.Object};
         }
 
@@ -26,10 +26,10 @@ namespace EventBackofficeBackend.Tests
         public async Task CreateAsync_ValidInput_ShouldReturnCreatedAtActionResult()
         {
             // Arrange
-            var contextOptions = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            var contextOptions = new DbContextOptionsBuilder<BackendContext>()
                 .UseSqlite("Data Source = EBO.db")
                 .Options;
-            var context = new EventBackofficeBackendContext(contextOptions);
+            var context = new BackendContext(contextOptions);
             var repository = new EventsRepository { _context = context };
             var postRequest = new PostEventRequest
             {
@@ -49,10 +49,10 @@ namespace EventBackofficeBackend.Tests
         public async Task CreateAsync_EventNameAlreadyExists_ShouldReturnBadRequestObjectResult()
         {
             // Arrange
-            var contextOptions = new DbContextOptionsBuilder<EventBackofficeBackendContext>()
+            var contextOptions = new DbContextOptionsBuilder<BackendContext>()
                 .UseSqlite("Data Source = EBO.db")
                 .Options;
-            var context = new EventBackofficeBackendContext(contextOptions);
+            var context = new BackendContext(contextOptions);
             var repository = new EventsRepository { _context = context };
             var existingEvent = new Event { Name = "Test Event", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1) };
             context.Events.Add(existingEvent);

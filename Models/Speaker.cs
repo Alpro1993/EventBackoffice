@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace EventBackofficeBackend.Models;
+namespace EventBackoffice.Backend.Models;
 public class Speaker : Person
 {
     // Relationships

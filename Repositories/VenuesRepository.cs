@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Sqlite;
-using EventBackofficeBackend.Data;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Data;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Repositories;
+namespace EventBackoffice.Backend.Repositories;
 public class VenuesRepository
 {
-    private readonly EventBackofficeBackendContext _context;
+    private readonly BackendContext _context;
 
-    public VenuesRepository(EventBackofficeBackendContext context) 
+    public VenuesRepository(BackendContext context) 
     {
         _context = context;
     }

@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using EventBackofficeBackend.Models;
+using EventBackoffice.Backend.Models;
 
-namespace EventBackofficeBackend.Data;
-public class EventBackofficeBackendContext : DbContext
+namespace EventBackoffice.Backend.Data;
+public class BackendContext : DbContext
 {
-    public EventBackofficeBackendContext (DbContextOptions<EventBackofficeBackendContext> options)
+    public BackendContext (DbContextOptions<BackendContext> options)
         : base(options)
     {
     }
